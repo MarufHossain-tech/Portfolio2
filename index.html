@@ -3,36 +3,511 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Md Maruf Hossain Tasin – Portfolio</title>
+  <title>Md Maruf Hossain Tasin — Portfolio</title>
+  <!-- Tailwind via CDN (no build step) -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root{
+      --mit-red:#A31F34; --mit-gray:#8A8B8C; --mit-silver:#C2C0BF; --mit-coal:#222222; --mit-jet:#111111; --mit-white:#ffffff;
+    }
+    html,body{background:linear-gradient(180deg,var(--mit-jet),var(--mit-coal));}
+    .glass{backdrop-filter: blur(8px); background: rgba(10,10,10,0.55);}
+  </style>
 </head>
-<body class="min-h-screen bg-gray-950 text-gray-100">
-  <main class="mx-auto max-w-3xl p-6 space-y-8">
-    <header>
-      <h1 class="text-3xl font-bold">Md Maruf Hossain Tasin</h1>
-      <p class="text-gray-400">Researcher | Renewable Energy | Space Systems</p>
-    </header>
+<body class="min-h-screen text-zinc-100">
+  <!-- Galaxy + Cursor canvases -->
+  <canvas id="galaxy" class="fixed inset-0 -z-10" aria-hidden></canvas>
+  <canvas id="cursorHalo" class="fixed inset-0 pointer-events-none z-[60] mix-blend-screen opacity-70" aria-hidden></canvas>
 
-    <section>
-      <h2 class="text-xl font-semibold">About</h2>
-      <p>I work on decentralized intelligent hybrid renewable systems, nanosatellites, and novel power architectures.</p>
-    </section>
+  <!-- Header / Nav -->
+  <header class="sticky top-0 z-50 border-b/0" style="backdrop-filter:saturate(120%) blur(8px); background:rgba(0,0,0,.25); border-color:#2b2b2b;">
+    <div class="relative">
+      <!-- simple matrix rain strip -->
+      <div class="absolute inset-0 opacity-30" style="pointer-events:none">
+        <canvas id="navRain" aria-hidden></canvas>
+      </div>
+      <div class="container mx-auto px-4 py-2 relative">
+        <div class="flex items-center justify-between gap-3">
+          <button id="brandBtn" class="text-sm font-mono tracking-widest text-zinc-300">Maruf Hossain</button>
+          <div class="flex gap-2">
+            <a href="https://github.com/MarufHossain-tech" target="_blank" rel="noreferrer" class="p-2 rounded-full border" style="border-color:#2b2b2b" aria-label="GitHub"><i data-lucide="github"></i></a>
+            <a href="http://www.linkedin.com/in/marufhossaintasin" target="_blank" rel="noreferrer" class="p-2 rounded-full border" style="border-color:#2b2b2b" aria-label="LinkedIn"><i data-lucide="linkedin"></i></a>
+            <a href="mailto:mdmarufhossaintasin@gmail.com" class="p-2 rounded-full border" style="border-color:#2b2b2b" aria-label="Email"><i data-lucide="mail"></i></a>
+          </div>
+        </div>
+        <nav id="topNav" class="mt-2 flex flex-wrap gap-2"></nav>
+      </div>
+    </div>
+  </header>
 
-    <section>
-      <h2 class="text-xl font-semibold">Projects</h2>
-      <ul class="list-disc pl-6 space-y-1">
-        <li><a href="https://github.com/MarufHossain-tech" class="underline">HyDRen Float Mod</a> – floating tri-hybrid PV/HKT/Wind modules.</li>
-        <li><a href="https://ieeexplore.ieee.org/document/10839745" class="underline">AQUALUNG</a> – autonomous underwater vehicle, IEEE 2022.</li>
-        <li><a href="https://samakal.com/bangladesh/article/2301150342" class="underline">AUSTSAT</a> – first nanosatellite in Bangladesh.</li>
-      </ul>
-    </section>
+  <!-- HERO -->
+  <section id="hero" class="relative overflow-hidden">
+    <div class="container mx-auto px-4 pt-16 md:pt-24 pb-12 md:pb-20">
+      <div class="grid md:grid-cols-2 gap-8 items-start">
+        <div class="flex md:justify-start">
+          <div class="relative">
+            <img src="/profile.jpg" alt="Portrait of Md Maruf Hossain Tasin" class="w-48 h-48 md:w-[22rem] md:h-[22rem] rounded-2xl object-cover border" style="border-color:var(--mit-red); background: #a31f3411"/>
+            <div class="absolute -bottom-2 -right-2 px-2 py-0.5 rounded-full text-[10px] border" style="border-color:var(--mit-red); background:#a31f3422">Open to PhD 2026</div>
 
-    <section>
-      <h2 class="text-xl font-semibold">Contact</h2>
-      <p>Email: mdmarufhossaintasin@gmail.com</p>
-      <p>LinkedIn: <a class="underline" href="http://www.linkedin.com/in/marufhossaintasin">Profile</a></p>
-      <p>GitHub: <a class="underline" href="https://github.com/MarufHossain-tech">Repos</a></p>
-    </section>
-  </main>
+            <!-- SDG tiles with upload -->
+            <div class="mt-3" id="sdgGrid"></div>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-4">
+          <div>
+            <h1 class="text-3xl md:text-5xl font-extrabold leading-tight">Md Maruf Hossain Tasin</h1>
+            <p class="mt-2 text-zinc-300 max-w-prose">PhD Research Enthusiast.</p>
+            <p class="mt-2 text-xs text-zinc-400">Based in Dhaka, Bangladesh</p>
+          </div>
+
+          <div class="glass rounded-2xl p-5 md:p-6 border" style="border-color:#2b2b2b">
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <div class="text-sm opacity-80">TOEFL iBT</div>
+                <div class="text-3xl font-bold">91 / 120</div>
+                <div class="text-xs opacity-60 mt-1">R 23 • L 23 • S 23 • W 22</div>
+              </div>
+              <div>
+                <div class="text-sm opacity-80">BSc EEE</div>
+                <div class="text-3xl font-bold">AUST</div>
+                <div class="text-xs opacity-60 mt-1">Thesis 4.00 • CGPA 3.00</div>
+              </div>
+              <div class="col-span-2 h-px bg-neutral-800 my-1"></div>
+              <div id="about" class="col-span-2">
+                <div class="text-sm font-semibold">About</div>
+                <p class="mt-1 text-sm text-zinc-300">Research-focused EEE graduate working on decentralized hybrid renewables, nanosatellite EPS, and lead‑free perovskites. Interests span IoT, control, techno‑economics, and photonics‑based comms.</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured -->
+  <section id="featured" class="scroll-mt-32 relative py-8 md:py-12">
+    <div class="container mx-auto px-4">
+      <h2 class="text-2xl md:text-3xl font-bold tracking-tight">Featured</h2>
+      <p class="mt-2 text-sm md:text-base text-zinc-300">Top work. Each card expands later with media and writeups.</p>
+      <div id="featuredGrid" class="mt-8 grid md:grid-cols-3 gap-6"></div>
+    </div>
+  </section>
+
+  <!-- Research Areas -->
+  <section id="interests" class="scroll-mt-32 relative py-8 md:py-12">
+    <div class="container mx-auto px-4">
+      <h2 class="text-2xl md:text-3xl font-bold tracking-tight">Research Areas</h2>
+      <div class="mt-8 grid md:grid-cols-3 gap-6">
+        <div class="glass rounded-2xl p-5 md:p-6 border md:col-span-2" style="border-color:#2b2b2b">
+          <div id="interestPills" class="flex flex-wrap"></div>
+          <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4" id="metersLeft"></div>
+        </div>
+        <div class="glass rounded-2xl p-5 md:p-6 border" style="border-color:#2b2b2b">
+          <div class="h-64" id="radarCanvasWrap">
+            <!-- simple canvas radar (no lib) -->
+            <canvas id="radarCanvas" width="360" height="260" style="width:100%; height:100%"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Experience (research + professional) -->
+  <section id="experience" class="scroll-mt-32 relative py-8 md:py-12">
+    <div class="container mx-auto px-4">
+      <h2 class="text-2xl md:text-3xl font-bold tracking-tight">Experience</h2>
+      <p class="mt-2 text-sm md:text-base text-zinc-300">Research first. Professional second.</p>
+      <div class="mt-6 grid md:grid-cols-2 gap-6">
+        <div>
+          <h4 class="font-semibold mb-4 flex items-center gap-2"><i data-lucide="brain"></i> Research Experience</h4>
+          <div id="researchExp"></div>
+        </div>
+        <div>
+          <h4 class="font-semibold mb-4 flex items-center gap-2"><i data-lucide="briefcase"></i> Professional Experience</h4>
+          <div id="professionalExp"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Publications -->
+  <section id="publications" class="scroll-mt-32 relative py-8 md:py-12">
+    <div class="container mx-auto px-4">
+      <h2 class="text-2xl md:text-3xl font-bold tracking-tight">Publications &amp; IP</h2>
+      <div class="mt-8 grid md:grid-cols-2 gap-6" id="pubWrap"></div>
+      <div class="mt-4 p-4 rounded-xl border" style="border-color:#2b2b2b">
+        <div class="text-xs text-neutral-400">Extension space: add DOIs, preprints, open datasets, and code repositories.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Grants -->
+  <section id="grants" class="scroll-mt-32 relative py-8 md:py-12">
+    <div class="container mx-auto px-4">
+      <h2 class="text-2xl md:text-3xl font-bold tracking-tight">Grants</h2>
+      <p class="mt-2 text-sm md:text-base text-zinc-300">Funding and scope</p>
+      <div id="grantsGrid" class="mt-8 grid md:grid-cols-2 gap-6"></div>
+    </div>
+  </section>
+
+  <!-- Teaching -->
+  <section id="teaching" class="scroll-mt-32 relative py-8 md:py-12">
+    <div class="container mx-auto px-4">
+      <h2 class="text-2xl md:text-3xl font-bold tracking-tight">Teaching &amp; Mentorship</h2>
+      <div id="teachingGrid" class="mt-8 grid md:grid-cols-2 gap-6"></div>
+    </div>
+  </section>
+
+  <!-- Awards -->
+  <section id="awards" class="scroll-mt-32 relative py-8 md:py-12">
+    <div class="container mx-auto px-4">
+      <h2 class="text-2xl md:text-3xl font-bold tracking-tight">Awards</h2>
+      <div class="glass rounded-2xl p-5 md:p-6 border" style="border-color:#2b2b2b">
+        <ul class="grid md:grid-cols-2 gap-3 text-sm text-neutral-300">
+          <li>Featured in Daily SAMAKAL for first “Made in Bangladesh” nanosatellite effort (Jan 2023)</li>
+          <li>Emerging Talent of the Year — Alfatah Enterprise</li>
+          <li>Top 5 — AUST Research Symposium 2022</li>
+          <li>Finalist — Hult Prize On‑Campus 2023</li>
+          <li>Winner — Lanka Bangla Notre Dame Science Festival 2013</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section id="contact" class="scroll-mt-32 relative py-8 md:py-12">
+    <div class="container mx-auto px-4">
+      <h2 class="text-2xl md:text-3xl font-bold tracking-tight">Contact</h2>
+      <div class="mt-6 glass rounded-2xl p-5 md:p-6 border" style="border-color:#2b2b2b">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <div class="text-sm opacity-80">Email</div>
+            <a href="mailto:mdmarufhossaintasin@gmail.com" class="text-lg font-semibold hover:underline">mdmarufhossaintasin@gmail.com</a>
+          </div>
+          <div class="flex gap-3">
+            <a href="https://github.com/MarufHossain-tech" target="_blank" rel="noreferrer" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border" style="border-color:#2b2b2b"><i data-lucide="github"></i> GitHub</a>
+            <a href="http://www.linkedin.com/in/marufhossaintasin" target="_blank" rel="noreferrer" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border" style="border-color:#2b2b2b"><i data-lucide="linkedin"></i> LinkedIn</a>
+            <a href="https://scholar.google.com/citations?user=ONXskv0AAAAJ&hl=en" target="_blank" rel="noreferrer" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border" style="border-color:var(--mit-red); background:#a31f3422"><i data-lucide="book-open"></i> Scholar</a>
+          </div>
+        </div>
+      </div>
+      <div class="mt-6 p-4 rounded-xl border" style="border-color:#2b2b2b">
+        <div class="text-xs text-neutral-400">Next edits</div>
+        <ul class="list-disc list-inside text-sm text-neutral-300">
+          <li>Add project images, videos, and paper links to Featured.</li>
+          <li>Attach a PDF resume link and include a publications BibTeX modal.</li>
+          <li>Add a section for open problems or research proposals.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <footer class="py-8 text-center text-xs text-neutral-500">© <span id="year"></span> Md Maruf Hossain Tasin. MIT palette. Single‑page with anchored nav.</footer>
+  <button id="toTop" class="fixed bottom-4 right-4 p-3 rounded-full border shadow-lg" style="border-color:var(--mit-red); background:#a31f3422" aria-label="Back to top"><i data-lucide="chevron-up"></i></button>
+
+  <!-- Lucide icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+  // ---------- Data ----------
+  const NAV = [
+    { id: "about", label: "About" },
+    { id: "interests", label: "Research" },
+    { id: "featured", label: "Featured" },
+    { id: "experience", label: "Experience" },
+    { id: "publications", label: "Publications" },
+    { id: "grants", label: "Grants" },
+    { id: "teaching", label: "Teaching" },
+    { id: "awards", label: "Awards" },
+    { id: "contact", label: "Contact" },
+  ];
+
+  const interests = [
+    "Renewable Energy","IoT","Decentralized Intelligent Systems","Nano-Energy Harvesters","Electrical Power System Design","Photonics-based Comms"
+  ];
+
+  const metersLeft = [
+    ["Decentralized Control",78],["Techno‑Economics",82],["CFD/Physics Sim",66],["Photonics/Optics",58],
+    ["Embedded Systems",80],["Computer Vision",60],["Power Electronics",72],["Scientific Writing",80]
+  ];
+
+  const radar = [
+    { key: "Modeling", v: 85 },{ key: "Simulation", v: 90 },{ key: "Hardware", v: 75 },{ key: "Algorithms", v: 70 },{ key: "Tech Writing", v: 80 },{ key: "Mentoring", v: 80 }
+  ];
+
+  const featured = [
+    { title:"2U Nanosatellite EPS + Optical Downlink", tag:"AUST Nanosatellite Lab", bullets:["EPS and MPPT","ROS optical downlink","Vision on Xilinx Arty A7"] },
+    { title:"AQUALUNG AUV", tag:"Underwater Robotics", bullets:["Raspberry Pi backbone","Underwater kill switch","YOLO CV pipeline"] },
+    { title:"Riverine Hybrid Renewable Platform", tag:"Decentralized Energy", bullets:["Homer Pro TEA","CFD via COMSOL","Sediment + solar cleaning"] },
+    { title:"Lead‑Free Perovskite with RGO Contacts", tag:"Photovoltaics", bullets:["SCAPS‑1D + COMSOL","Work‑function tuning","PCE 21.23% (sim)"] },
+    { title:"IoDPS Patent Manuscript", tag:"Intelligent Power Module", bullets:["Decentralized control","Hybrid storage","Target filing Dec 2025"] },
+    { title:"DeSmES Lab Simulator", tag:"Open‑source Tooling", bullets:["Techno‑economic analysis","MIT‑style license","Web based"] },
+  ];
+
+  const researchExp = [
+    {org:"BRAC University",role:"Research Assistant (Part-time, 15 h/wk)",period:"Oct 2024 – Present",bullets:["Decentralized riverine hybrid renewables; microelectronics for smart management","TEA in HOMER Pro; CFD in COMSOL","Outcome: under review at Energy Reports"],long:"Built a co-optimized scheduling strategy for PV+hydrokinetic+storage. Addressed fluctuating water levels, sedimentation, and PV soiling via control and maintenance windows."},
+    {org:"McGill University (Remote)",role:"Research Assistant (Part-time, 15 h/wk)",period:"Oct 2024 – Present",bullets:["Lead-free perovskite with reduced graphene oxide back-contact","SCAPS-1D + COMSOL twins; work-function sweep","PCE 21.23% in sim; JPCS under review"],long:"Investigated contact energetics and transport layers. Simulated optical-electrical coupling to estimate achievable device stack efficiency."},
+    {org:"AUST Nanosatellite Communication Lab",role:"Research Assistant",period:"Dec 2023 – Oct 2024",bullets:["Built EPS and MPPT","Optical downlink via ROS; vision on Arty A7 + OpenCV","ICICT 2024 paper; Daily SAMAKAL feature"],long:"Designed pulsed-load tolerant EPS and prototyped free-space optical link using off-the-shelf components and custom modulation."},
+    {org:"AUST Rocketry Team",role:"Research Intern",period:"Jul 2022 – Jul 2023",bullets:["Solid-fuel stack for Bijoy‑71","Arduino Mega avionics; faster trigger","Ground station EPS design"],long:"Implemented telemetry and power budgeting for subsonic sounding model rocket effort across multiple static tests."}
+  ];
+
+  const professional = [
+    {org:"Alfatah PowerTech | Alfatah Enterprise",role:"Lead Engineer → Design Engineer → Trainee → HVAC Operator",period:"Jan 2019 – Jan 2022",bullets:["Simulation-driven R&D workflow; −67% dev time","Remodeled PE control in MATLAB; −30% total cost","Emerging Talent of the Year"],long:"Owned model-in-the-loop validation and migrated legacy controllers to parameterized MATLAB/Simulink libraries."}
+  ];
+
+  const publications = {
+    journals_under_review:[
+      {title:"Decentralized Smart Hybrid Renewable Riverine Floating Platform for 140% National Demand by 2030",venue:"Energy Reports",status:"Under review",long:"Modular floating platform integrating PV, hydrokinetic turbines, and hybrid storage with predictive maintenance scheduling."},
+      {title:"Design & Performance Analysis of Lead‑Free Perovskite Solar Cells with RGO Contacts",venue:"Journal of Physics and Chemistry of Solids",status:"Under review",long:"Evaluates reduced graphene oxide as a back-contact with work-function tuning; demonstrates simulated PCE 21.23%."}
+    ],
+    manuscripts:[
+      {title:"Co‑Optimized CubeSat EPS Design: Predictive Scheduling with Pulsed Loads",venue:"Target: IEEE T-AES",status:"In prep",long:"EPS–payload co-scheduling to stabilize bus voltage under pulsed imaging workloads."},
+      {title:"Australian Desert Food+Energy with Modular Nuclear + Agrivoltaics",venue:"Target: IEEE/Elsevier",status:"In prep",long:"Systems analysis for food-energy-water resilience using SMR + agrivoltaic layouts."}
+    ],
+    conferences:[
+      {title:"Implementation of the AQUALUNG AUV",venue:"IEEE/OES AUV Symposium 2022",doi:"10.1109/auv53081.2022.9965924",long:"Compact AUV with acoustic-magnetic kill switch and YOLO-based detection.",links:[{label:"DOI",href:"https://doi.org/10.1109/auv53081.2022.9965924"}]},
+      {title:"Hybrid Monitoring for Sundarbans Mangrove",venue:"ICICT 2024",doi:"10.1109/icict64387.2024.10839745",long:"Satellite imagery + classical CV for mangrove monitoring.",links:[{label:"DOI",href:"https://doi.org/10.1109/icict64387.2024.10839745"}]}
+    ],
+    chapters:[
+      {title:"Avionics for Subsonic Sounding Rocket",venue:"Springer, 2024",status:"Under review",long:"Avionics architecture and test methodology."},
+      {title:"Feasibility and Case Studies",venue:"Springer, 2024",status:"Manuscript",long:"Feasibility analysis for low-cost sounding rocket programs."}
+    ],
+    ip:[
+      {title:"IoDPS: Decentralized Intelligent Hybrid Power System Module",type:"Patent manuscript",target:"Dec 2025",long:"Modular power module with distributed control for microgrids and spacecraft."}
+    ]
+  };
+
+  const teaching = [
+    {org:"NIET, Bangladesh",role:"Junior Instructor (Part-time, 12 h/wk)",period:"Jul 2025 – Present",work:["EE 26761: AC Machines I","EE 26762: T&D of Electrical Power I","EE 26774: Renewable Energy & Power Plant Technology"],long:"Prepared outcome-based assessments and labs for rotating machines and RE systems."},
+    {org:"Tree Research Academy",role:"Pioneer & Lead Mentor",period:"May 2023 – Mar 2024",work:["Mentored 67+ undergrads","21/30 finalists; 2 awards; 3 pubs"],long:"Weekend research incubator focused on fast-tracking publication skills and reproducible workflows."}
+  ];
+
+  const grants = [
+    {name:"Establishment Grant", details:"5‑year, $200K for Nanosatellite & Communication Lab incl. AUSTSAT prototype", year:"2023"},
+    {name:"AUST Research & Innovation Grant", details:"$3K for AQUALUNG AUV prototype and field tests", year:"2021"}
+  ];
+
+  // ---------- Helpers ----------
+  const byId = (id)=>document.getElementById(id);
+  function pill(txt){
+    const span=document.createElement('span');
+    span.className='px-2.5 py-1 rounded-full text-xs border mr-2 mb-2 inline-flex items-center';
+    span.style.borderColor='#2b2b2b'; span.style.color='var(--mit-silver)';
+    span.textContent=txt; return span;
+  }
+  function card(){
+    const d=document.createElement('div');
+    d.className='glass rounded-2xl p-5 md:p-6 border'; d.style.borderColor='#2b2b2b';
+    return d;
+  }
+  function sectionButton(id,label){
+    const b=document.createElement('button');
+    b.className='px-3 py-1.5 rounded-full text-sm border transition-colors';
+    b.style.borderColor="#2b2b2b"; b.style.color='var(--mit-silver)';
+    b.textContent=label; b.onclick=()=>document.getElementById(id).scrollIntoView({behavior:'smooth', block:'start'});
+    b.dataset.target=id; return b;
+  }
+
+  // ---------- Build Nav ----------
+  const navWrap=byId('topNav');
+  NAV.forEach(n=>navWrap.appendChild(sectionButton(n.id,n.label)));
+  document.getElementById('brandBtn').onclick=()=>document.getElementById('hero').scrollIntoView({behavior:'smooth'});
+
+  // activate on scroll
+  const obs=new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(!e.isIntersecting) return; const id=e.target.id; 
+      [...navWrap.children].forEach(btn=>{
+        const active=btn.dataset.target===id; 
+        btn.style.borderColor=active? 'var(--mit-red)':'#2b2b2b';
+        btn.style.color=active? 'var(--mit-white)': 'var(--mit-silver)';
+        btn.style.background=active? '#a31f3422':'transparent';
+      });
+    })
+  },{rootMargin:'-40% 0px -55% 0px',threshold:[0,0.2,0.5,1]});
+  NAV.forEach(n=>{const el=document.getElementById(n.id); if(el) obs.observe(el)});
+
+  // ---------- SDG grid with upload ----------
+  (function(){
+    const host=byId('sdgGrid');
+    const goals=[
+      { id: 4, label: 'Quality Education' },
+      { id: 7, label: 'Clean Energy' },
+      { id: 9, label: 'Industry & Innovation' },
+      { id: 11, label: 'Sustainable Cities' },
+      { id: 13, label: 'Climate Action' },
+      { id: 14, label: 'Life Below Water' }
+    ];
+    const grid=document.createElement('div'); grid.className='grid grid-cols-3 sm:grid-cols-6 gap-3';
+    const icons=new Array(goals.length).fill(null);
+    goals.forEach((g,i)=>{
+      const box=document.createElement('div');
+      box.className='rounded-xl border flex flex-col items-center justify-center px-2 py-2 text-center';
+      box.style.borderColor='#2b2b2b'; box.style.background='#a31f3410'; box.style.height='84px';
+      const imgWrap=document.createElement('div'); imgWrap.className='w-12 h-12 rounded-lg overflow-hidden flex items-center justify-center border'; imgWrap.style.borderColor='#2b2b2b'; imgWrap.style.background='var(--mit-red)';
+      const txt=document.createElement('div'); txt.className='text-xs font-bold'; txt.style.color='white'; txt.textContent='SDG '+g.id;
+      imgWrap.appendChild(txt); box.appendChild(imgWrap);
+      const label=document.createElement('div'); label.className='mt-2 text-[11px] leading-tight'; label.style.color='var(--mit-silver)'; label.textContent=g.label; box.appendChild(label);
+      grid.appendChild(box);
+      icons[i]={box,imgWrap};
+    });
+    host.appendChild(grid);
+
+    const row=document.createElement('div'); row.className='mt-2 flex items-center gap-2';
+    const btn=document.createElement('button'); btn.className='px-2.5 py-1.5 rounded-md text-xs border'; btn.style.borderColor='var(--mit-red)'; btn.style.background='#a31f3422'; btn.style.color='white'; btn.textContent='Upload SDG icons';
+    const tip=document.createElement('div'); tip.className='text-[11px] opacity-70'; tip.style.color='var(--mit-silver)'; tip.textContent='Tip: provide 6 square PNG/SVG files for symmetry.';
+    const input=document.createElement('input'); input.type='file'; input.accept='image/*'; input.multiple=true; input.className='hidden';
+    btn.onclick=()=>input.click();
+    input.onchange=(e)=>{ const files=[...e.target.files].slice(0,icons.length); files.forEach((f,i)=>{ const url=URL.createObjectURL(f); const img=document.createElement('img'); img.src=url; img.className='w-full h-full object-contain'; icons[i].imgWrap.innerHTML=''; icons[i].imgWrap.style.background='transparent'; icons[i].imgWrap.appendChild(img); }); };
+    row.appendChild(btn); row.appendChild(input); row.appendChild(tip); host.appendChild(row);
+  })();
+
+  // ---------- Featured cards ----------
+  (function(){
+    const host=byId('featuredGrid');
+    featured.forEach(f=>{
+      const c=card();
+      const hero=document.createElement('div'); hero.className='h-28 w-full rounded-xl mb-3'; hero.style.background='linear-gradient(135deg,#a31f3433,#8A8B8C22)'; hero.style.border='1px solid #2b2b2b'; c.appendChild(hero);
+      const tag=document.createElement('div'); tag.className='text-xs uppercase tracking-wide opacity-70'; tag.textContent=f.tag; c.appendChild(tag);
+      const h3=document.createElement('h3'); h3.className='text-lg font-semibold mt-1'; h3.textContent=f.title; c.appendChild(h3);
+      const ul=document.createElement('ul'); ul.className='mt-2 text-sm list-disc list-inside text-neutral-300'; f.bullets.forEach(b=>{const li=document.createElement('li'); li.textContent=b; ul.appendChild(li);}); c.appendChild(ul);
+      const hint=document.createElement('div'); hint.className='mt-3 text-xs text-neutral-400'; hint.textContent='Add: repo, demo, images'; c.appendChild(hint);
+      host.appendChild(c);
+    });
+  })();
+
+  // ---------- Interest pills + meters ----------
+  interests.forEach(t=>byId('interestPills').appendChild(pill(t)));
+  (function(){
+    const wrap=byId('metersLeft');
+    function bar(label,val){
+      const box=document.createElement('div'); box.className='space-y-2 mb-3';
+      const head=document.createElement('div'); head.className='flex justify-between text-xs text-neutral-300'; head.innerHTML=`<span>${label}</span><span>${val}%</span>`; box.appendChild(head);
+      const rail=document.createElement('div'); rail.className='h-2.5 rounded-full bg-neutral-800 overflow-hidden';
+      const fill=document.createElement('div'); fill.className='h-full rounded-full'; fill.style.background='linear-gradient(90deg,#A31F34,#8A8B8C)'; fill.style.width='0%';
+      rail.appendChild(fill); box.appendChild(rail); wrap.appendChild(box);
+      requestAnimationFrame(()=>{setTimeout(()=>{fill.style.transition='width .8s ease'; fill.style.width=val+'%';},100)});
+    }
+    metersLeft.forEach(([l,v])=>bar(l,v));
+  })();
+
+  // ---------- Simple radar canvas (no external lib) ----------
+  ;(function(){
+    const c=byId('radarCanvas'); if(!c) return; const ctx=c.getContext('2d');
+    const w=c.width, h=c.height; const cx=w/2, cy=h/2 + 10; const maxR=Math.min(w,h)/2 - 20; const N=radar.length; 
+    ctx.clearRect(0,0,w,h); ctx.font='10px monospace'; ctx.fillStyle='#c9c9c9'; ctx.strokeStyle='#555';
+    // grid rings
+    for(let r=0.25; r<=1.0; r+=0.25){ ctx.beginPath(); ctx.arc(cx,cy,maxR*r,0,Math.PI*2); ctx.stroke(); }
+    // axes + labels
+    radar.forEach((d,i)=>{ const ang= (i/N)*Math.PI*2 - Math.PI/2; const x=cx+Math.cos(ang)*maxR; const y=cy+Math.sin(ang)*maxR; ctx.strokeStyle='#666'; ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(x,y); ctx.stroke(); const lx=cx+Math.cos(ang)*(maxR+10); const ly=cy+Math.sin(ang)*(maxR+10); ctx.fillText(d.key,lx-12,ly+3); });
+    // polygon
+    ctx.beginPath(); radar.forEach((d,i)=>{ const ang=(i/N)*Math.PI*2 - Math.PI/2; const r=maxR*(d.v/100); const x=cx+Math.cos(ang)*r; const y=cy+Math.sin(ang)*r; if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y); }); ctx.closePath(); ctx.fillStyle='rgba(163,31,52,0.35)'; ctx.strokeStyle='#A31F34'; ctx.fill(); ctx.stroke();
+  })();
+
+  // ---------- Experience lists ----------
+  function expandable(org, sub, bullets, long){
+    const c=card();
+    const btn=document.createElement('button'); btn.className='w-full text-left'; btn.setAttribute('aria-expanded','false');
+    const row=document.createElement('div'); row.className='flex items-start justify-between gap-3';
+    const l=document.createElement('div'); l.innerHTML=`<div class="font-semibold">${org}</div><div class="text-sm opacity-80">${sub}</div>`; row.appendChild(l);
+    const ico=document.createElement('i'); ico.setAttribute('data-lucide','chevron-down'); row.appendChild(ico);
+    const ul=document.createElement('ul'); ul.className='mt-2 list-disc list-inside text-sm text-neutral-300'; bullets.forEach(b=>{const li=document.createElement('li'); li.textContent=b; ul.appendChild(li);});
+    btn.appendChild(row); btn.appendChild(ul); c.appendChild(btn);
+
+    const details=document.createElement('div'); details.className='pt-4 border-t mt-4 hidden'; details.style.borderColor='#2b2b2b'; details.innerHTML=`<p class="text-sm text-neutral-300">${long}</p>`; c.appendChild(details);
+    btn.onclick=()=>{ const open=details.classList.toggle('hidden'); btn.setAttribute('aria-expanded', open? 'false':'true'); ico.style.transform = open? 'rotate(0deg)':'rotate(180deg)'; };
+    return c;
+  }
+  (function(){
+    const R=byId('researchExp'); researchExp.forEach(e=> R.appendChild(expandable(e.org, `${e.role} · ${e.period}`, e.bullets, e.long)) );
+    const P=byId('professionalExp'); professional.forEach(e=> P.appendChild(expandable(e.org, `${e.role} · ${e.period}`, e.bullets, e.long)) );
+  })();
+
+  // ---------- Publications ----------
+  (function(){
+    const host=byId('pubWrap');
+    const left=card(); const right=card();
+
+    const sec = (title)=>{ const h=document.createElement('h4'); h.className='font-semibold mb-2'; h.textContent=title; return h; };
+    const addItems = (wrap, items)=>{
+      items.forEach(p=>{
+        const c=card();
+        const hdr=document.createElement('div'); hdr.innerHTML=`<div class='font-semibold'>${p.title}</div><div class='text-sm opacity-80'>${p.venue}${p.status? ' · '+p.status:''}${p.doi? ' · DOI: '+p.doi:''}</div>`; c.appendChild(hdr);
+        const d=document.createElement('div'); d.className='pt-4 border-t mt-4'; d.style.borderColor='#2b2b2b'; d.innerHTML=`<p class='text-sm text-neutral-300'>${p.long||''}</p>`; c.appendChild(d);
+        if(p.links && p.links.length){ const group=document.createElement('div'); group.className='flex flex-wrap gap-2 mt-2'; p.links.forEach(l=>{ const a=document.createElement('a'); a.href=l.href; a.target='_blank'; a.rel='noreferrer'; a.className='text-xs underline opacity-80'; a.textContent=l.label; group.appendChild(a);}); c.appendChild(group); }
+        wrap.appendChild(c);
+      });
+    };
+
+    left.appendChild(sec('Journals — under review')); addItems(left, publications.journals_under_review);
+    const h2=document.createElement('h4'); h2.className='font-semibold mt-5 mb-2'; h2.textContent='Manuscripts — in preparation'; left.appendChild(h2); addItems(left, publications.manuscripts);
+
+    right.appendChild(sec('Conferences')); addItems(right, publications.conferences);
+    const h3=document.createElement('h4'); h3.className='font-semibold mt-5 mb-2'; h3.textContent='Book chapters'; right.appendChild(h3); addItems(right, publications.chapters);
+    const h4=document.createElement('h4'); h4.className='font-semibold mt-5 mb-2'; h4.textContent='IP and tech disclosures'; right.appendChild(h4); addItems(right, publications.ip);
+
+    host.appendChild(left); host.appendChild(right);
+  })();
+
+  // ---------- Grants ----------
+  (function(){
+    const host=byId('grantsGrid');
+    grants.forEach(g=>{ const c=card(); const row=document.createElement('div'); row.className='flex items-start justify-between gap-3'; const l=document.createElement('div'); l.innerHTML=`<div class='font-semibold'>${g.name}</div><div class='text-sm opacity-80'>${g.details}</div>`; const r=document.createElement('div'); r.className='text-xs opacity-60 whitespace-nowrap'; r.textContent=g.year; row.appendChild(l); row.appendChild(r); c.appendChild(row); host.appendChild(c); });
+  })();
+
+  // ---------- Teaching ----------
+  (function(){
+    const host=byId('teachingGrid');
+    teaching.forEach(t=>{
+      const c=expandable(t.org, `${t.role} · ${t.period}`, t.work, t.long); host.appendChild(c);
+    });
+  })();
+
+  // ---------- Footer year ----------
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // ---------- To top button ----------
+  document.getElementById('toTop').onclick=()=>document.getElementById('hero').scrollIntoView({behavior:'smooth'});
+
+  // ---------- Lucide icons render ----------
+  if(window.lucide){ window.lucide.createIcons(); }
+
+  // ---------- Galaxy background ----------
+  (function(){
+    const canvas=document.getElementById('galaxy'); const ctx=canvas.getContext('2d'); let w,h,dpr; let state={t:0,stars:[],current:null,target:null};
+    const SCENES={hero:{planetR:70,orbitR:160,speed:0.12,color:'#A31F34',ring:'#C2C0BF'},about:{planetR:60,orbitR:180,speed:0.10,color:'#8A8B8C',ring:'#ffffff'},interests:{planetR:80,orbitR:200,speed:0.08,color:'#C2C0BF',ring:'#8A8B8C'},featured:{planetR:72,orbitR:220,speed:0.09,color:'#ffffff',ring:'#A31F34'},skills:{planetR:64,orbitR:190,speed:0.11,color:'#8A8B8C',ring:'#C2C0BF'},experience:{planetR:76,orbitR:210,speed:0.07,color:'#A31F34',ring:'#ffffff'},publications:{planetR:68,orbitR:230,speed:0.085,color:'#C2C0BF',ring:'#8A8B8C'},grants:{planetR:62,orbitR:185,speed:0.105,color:'#ffffff',ring:'#A31F34'},teaching:{planetR:74,orbitR:205,speed:0.095,color:'#8A8B8C',ring:'#C2C0BF'},awards:{planetR:66,orbitR:175,speed:0.115,color:'#ffffff',ring:'#8A8B8C'},contact:{planetR:70,orbitR:200,speed:0.09,color:'#A31F34',ring:'#C2C0BF'}};
+    function resize(){ dpr=Math.min(window.devicePixelRatio||1,2); w=canvas.width=Math.floor(window.innerWidth*dpr); h=canvas.height=Math.floor(window.innerHeight*dpr); canvas.style.width=window.innerWidth+'px'; canvas.style.height=window.innerHeight+'px'; if(!state.stars.length){ const N=140; state.stars=Array.from({length:N},()=>({x:Math.random()*w,y:Math.random()*h,r:(Math.random()*1.4+0.4)*dpr,a:Math.random()*Math.PI*2,s:0.2+Math.random()*0.6})); }}
+    function lerp(a,b,f){return a+(b-a)*f}
+    function mix(c1,c2,f){const a=parseInt(c1.slice(1),16),b=parseInt(c2.slice(1),16); const r=Math.round(lerp((a>>16)&255,(b>>16)&255,f)), g=Math.round(lerp((a>>8)&255,(b>>8)&255,f)), bl=Math.round(lerp(a&255,b&255,f)); return `rgb(${r},${g},${bl})`;}
+    function draw(){ const cur=state.current, tgt=state.target, stars=state.stars; ctx.clearRect(0,0,w,h); ctx.fillStyle='rgba(255,255,255,0.85)'; stars.forEach(s=>{ s.a+=0.002*s.s; const tw=0.6+Math.sin(s.a)*0.4; ctx.globalAlpha=0.35*tw; ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2); ctx.fill(); }); ctx.globalAlpha=1; cur.planetR=lerp(cur.planetR,tgt.planetR,0.02); cur.orbitR=lerp(cur.orbitR,tgt.orbitR,0.02); cur.speed=lerp(cur.speed,tgt.speed,0.05); cur.color=mix(tgt.color,cur.color||tgt.color,0.3); cur.ring=mix(tgt.ring,cur.ring||tgt.ring,0.3); cur.theta+=0.002*cur.speed; const cx=w*0.7, cy=h*0.25; ctx.strokeStyle='rgba(255,255,255,0.06)'; ctx.lineWidth=1*dpr; ctx.beginPath(); ctx.ellipse(cx,cy,cur.orbitR,cur.orbitR*0.66,0,0,Math.PI*2); ctx.stroke(); const px=cx+Math.cos(cur.theta)*cur.orbitR; const py=cy+Math.sin(cur.theta)*cur.orbitR*0.66; for(let i=0;i<40;i++){ const ang=(i/40)*Math.PI*2 + cur.theta*0.5; const rr=cur.planetR*1.6 + Math.sin(i+cur.theta)*2; const rx=px+Math.cos(ang)*rr; const ry=py+Math.sin(ang)*rr*0.6; const grd=ctx.createRadialGradient(rx,ry,0,rx,ry,6*dpr); grd.addColorStop(0,cur.ring); grd.addColorStop(1,'rgba(0,0,0,0)'); ctx.fillStyle=grd; ctx.beginPath(); ctx.arc(rx,ry,2.5*dpr,0,Math.PI*2); ctx.fill(); }
+    const pg=ctx.createRadialGradient(px-cur.planetR*0.4,py-cur.planetR*0.4,0,px,py,cur.planetR*1.4); pg.addColorStop(0,'rgba(255,255,255,0.8)'); pg.addColorStop(1,cur.color); ctx.fillStyle=pg; ctx.beginPath(); ctx.arc(px,py,cur.planetR,0,Math.PI*2); ctx.fill(); requestAnimationFrame(draw); }
+    function setScene(key){ state.target={...state.target,...(SCENES[key]||SCENES.hero)} }
+    function init(){ resize(); window.addEventListener('resize',resize); if(!state.current){ const init=SCENES.hero; state.current={...init,theta:0}; state.target={...init}; } draw(); }
+    init();
+    // link to section observer
+    const ids=['about','interests','featured','experience','publications','grants','teaching','awards','contact'];
+    const io=new IntersectionObserver((entries)=>{entries.forEach(e=>{ if(e.isIntersecting) setScene(e.target.id) })},{rootMargin:'-40% 0px -55% 0px',threshold:[0,0.2,0.5,1]}); ids.forEach(id=>{const el=document.getElementById(id); if(el) io.observe(el)});
+  })();
+
+  // ---------- Cursor halo ----------
+  (function(){
+    const canvas=document.getElementById('cursorHalo'); const ctx=canvas.getContext('2d'); let w,h,dpr; const pos={x:-1e4,y:-1e4}, smooth={x:-1e4,y:-1e4};
+    function resize(){ dpr=Math.min(window.devicePixelRatio||1,2); w=canvas.width=Math.floor(window.innerWidth*dpr); h=canvas.height=Math.floor(window.innerHeight*dpr); canvas.style.width=window.innerWidth+'px'; canvas.style.height=window.innerHeight+'px'; }
+    function move(e){ pos.x=e.clientX*(dpr||1); pos.y=e.clientY*(dpr||1); }
+    function draw(){ ctx.clearRect(0,0,w,h); smooth.x += (pos.x - smooth.x)*0.12; smooth.y += (pos.y - smooth.y)*0.12; const r=26*(dpr||1); const g=ctx.createRadialGradient(smooth.x,smooth.y,0,smooth.x,smooth.y,r*2.2); g.addColorStop(0,'#A31F3444'); g.addColorStop(1,'rgba(0,0,0,0)'); ctx.fillStyle=g; ctx.beginPath(); ctx.arc(smooth.x,smooth.y,r,0,Math.PI*2); ctx.fill(); requestAnimationFrame(draw); }
+    resize(); window.addEventListener('resize',resize); window.addEventListener('pointermove',move); draw();
+  })();
+
+  // ---------- Matrix nav rain ----------
+  (function(){
+    const canvas=document.getElementById('navRain'); const ctx=canvas.getContext('2d'); let w,h,dpr,cols,y;
+    const chars='0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+    function resize(){ dpr=Math.min(window.devicePixelRatio||1,2); const rect=canvas.parentElement.getBoundingClientRect(); const height=Math.max(54,rect.height); w=canvas.width=Math.floor(rect.width*dpr); h=canvas.height=Math.floor(height*dpr); canvas.style.width=rect.width+'px'; canvas.style.height=height+'px'; cols=Math.floor(w/(12*dpr)); y=Array(cols).fill(0); }
+    function draw(){ ctx.fillStyle='rgba(0,0,0,0.15)'; ctx.fillRect(0,0,w,h); ctx.fillStyle='#8A8B8C'; ctx.font=`${14*(dpr||1)}px monospace`; for(let i=0;i<y.length;i++){ const text=chars[Math.floor(Math.random()*chars.length)]; const x=i*12*(dpr||1); ctx.fillText(text,x,y[i]*18*(dpr||1)); if(y[i]*18*(dpr||1)>h && Math.random()>0.975) y[i]=0; y[i]++; } requestAnimationFrame(draw); }
+    resize(); window.addEventListener('resize',resize); draw();
+  })();
+  </script>
 </body>
 </html>
