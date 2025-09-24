@@ -228,9 +228,15 @@
     "Renewable Energy","IoT","Decentralized Intelligent Systems","Nano-Energy Harvesters","Electrical Power System Design","Photonics-based Comms"
   ];
 
-  const metersLeft = [
-    ["Decentralized Control",78],["Techno‑Economics",82],["CFD/Physics Sim",66],["Photonics/Optics",58],
-    ["Embedded Systems",80],["Computer Vision",60],["Power Electronics",72],["Scientific Writing",80]
+  const meters = [
+    { label: "Decentralized Control", value: 78, detail: "Model-predictive and distributed control for hybrid microgrids; emphasis on stability with variable resources and pulsed loads.", img: "" },
+    { label: "Techno‑Economics", value: 82, detail: "TEA of riverine PV + hydrokinetic platforms, O&M windows, and storage sizing using HOMER Pro.", img: "" },
+    { label: "CFD/Physics Sim", value: 66, detail: "Flow-field modeling for hydrokinetic turbines; thermal and optical coupling for PV/perovskite stacks in COMSOL.", img: "" },
+    { label: "Photonics/Optics", value: 58, detail: "Free‑space optical downlink prototypes; optical path budgeting and modulation trade‑offs.", img: "" },
+    { label: "Embedded Systems", value: 80, detail: "MCU/FPGA prototypes for EPS and instrumentation; ROS-based data links; sensor fusion.", img: "" },
+    { label: "Computer Vision", value: 60, detail: "Object detection for AUV and environmental monitoring; dataset curation and classical CV pipelines.", img: "" },
+    { label: "Power Electronics", value: 72, detail: "MPPT, bus regulation, and converter control; HIL validation and efficiency tuning.", img: "" },
+    { label: "Scientific Writing", value: 80, detail: "Journal manuscripts, grant proposals, and reproducible documentation (LaTeX, Git).", img: "" }
   ];
 
   const radar = [
@@ -382,15 +388,52 @@
   interests.forEach(t=>byId('interestPills').appendChild(pill(t)));
   (function(){
     const wrap=byId('metersLeft');
-    function bar(label,val){
-      const box=document.createElement('div'); box.className='space-y-2 mb-3';
-      const head=document.createElement('div'); head.className='flex justify-between text-xs text-neutral-300'; head.innerHTML=`<span>${label}</span><span>${val}%</span>`; box.appendChild(head);
-      const rail=document.createElement('div'); rail.className='h-2.5 rounded-full bg-neutral-800 overflow-hidden';
-      const fill=document.createElement('div'); fill.className='h-full rounded-full'; fill.style.background='linear-gradient(90deg,#A31F34,#8A8B8C)'; fill.style.width='0%';
-      rail.appendChild(fill); box.appendChild(rail); wrap.appendChild(box);
-      requestAnimationFrame(()=>{setTimeout(()=>{fill.style.transition='width .8s ease'; fill.style.width=val+'%';},100)});
+    function bar(item){
+      const box=document.createElement('div');
+      box.className='mb-3 rounded-xl border overflow-hidden';
+      box.style.borderColor='#2b2b2b';
+
+      const header=document.createElement('button');
+      header.className='w-full text-left p-3 bg-neutral-900/40';
+      header.innerHTML=`
+        <div class="flex items-center justify-between gap-3">
+          <div class="flex-1 space-y-2">
+            <div class="flex justify-between text-xs text-neutral-300">
+              <span>${item.label}</span><span>${item.value}%</span>
+            </div>
+            <div class="h-2.5 rounded-full bg-neutral-800 overflow-hidden">
+              <div class="fill h-full rounded-full" style="background:linear-gradient(90deg,#A31F34,#8A8B8C); width:0%"></div>
+            </div>
+          </div>
+          <i data-lucide="chevron-down" class="chev shrink-0"></i>
+        </div>`;
+
+      const details=document.createElement('div');
+      details.className='hidden p-3 border-t bg-black/20';
+      details.style.borderColor='#2b2b2b';
+      const media = item.img ? `<img src="${item.img}" class="w-full h-full object-cover" alt="${item.label}">` : `<div class="w-full h-full" style="background:linear-gradient(135deg,#a31f3433,#8A8B8C22)"></div>`;
+      details.innerHTML=`
+        <div class="grid md:grid-cols-3 gap-3">
+          <div class="md:col-span-2 text-sm text-neutral-300">${item.detail||''}</div>
+          <div class="aspect-video rounded-lg overflow-hidden border" style="border-color:#262626">${media}</div>
+        </div>`;
+
+      header.onclick=()=>{
+        const wasHidden=details.classList.contains('hidden');
+        details.classList.toggle('hidden');
+        const icon=header.querySelector('.chev');
+        if(icon) icon.style.transform = wasHidden ? 'rotate(180deg)' : 'rotate(0deg)';
+      };
+
+      box.appendChild(header);
+      box.appendChild(details);
+      wrap.appendChild(box);
+
+      // animate bar fill
+      const fill=header.querySelector('.fill');
+      requestAnimationFrame(()=>{ setTimeout(()=>{ fill.style.transition='width .8s ease'; fill.style.width=item.value+'%'; }, 120); });
     }
-    metersLeft.forEach(([l,v])=>bar(l,v));
+    meters.forEach(bar);
   })();
 
   // ---------- Simple radar canvas (no external lib) ----------
