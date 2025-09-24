@@ -95,24 +95,102 @@
     </div>
   </section>
 
-  <!-- Research Areas -->
-  <section id="interests" class="scroll-mt-32 relative py-8 md:py-12">
-    <div class="container mx-auto px-4">
-      <h2 class="text-2xl md:text-3xl font-bold tracking-tight">Research Areas</h2>
-      <div class="mt-8 grid md:grid-cols-3 gap-6">
-        <div class="glass rounded-2xl p-5 md:p-6 border md:col-span-2" style="border-color:#2b2b2b">
-          <div id="interestPills" class="flex flex-wrap"></div>
-          <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4" id="metersLeft"></div>
-        </div>
-        <div class="glass rounded-2xl p-5 md:p-6 border" style="border-color:#2b2b2b">
-          <div class="h-64" id="radarCanvasWrap">
-            <!-- simple canvas radar (no lib) -->
-            <canvas id="radarCanvas" width="360" height="260" style="width:100%; height:100%"></canvas>
-          </div>
-        </div>
+  <!-- 🔁 REPLACE your entire <section id="interests">...</section> with this block -->
+<section id="interests" class="scroll-mt-32 relative py-8 md:py-12">
+  <div class="container mx-auto px-4">
+    <h2 class="text-2xl md:text-3xl font-bold tracking-tight">Research Focus</h2>
+    <div class="mt-8 grid md:grid-cols-2 gap-6">
+
+      <!-- LEFT: Research Interests (cards/blocks) -->
+      <div id="interestBlocks" class="grid sm:grid-cols-2 gap-4"></div>
+
+      <!-- RIGHT: Essential Skills (hexagonal honeycomb) -->
+      <div>
+        <h3 class="text-lg font-semibold mb-3">Essential Skills</h3>
+        <div id="skillsHoneycomb"></div>
       </div>
+
     </div>
-  </section>
+  </div>
+</section>
+
+<!-- ➕ Add these styles inside <style> in <head> (keep your existing vars) -->
+<style>
+  /* --- Hex Honeycomb --- */
+  .hex-row{ display:flex; justify-content:center; gap:18px; }
+  .hex-row + .hex-row{ margin-top:-36px; } /* overlap rows for honeycomb effect */
+  .hex-row.is-offset{ margin-left:55px; } /* indent every other row */
+  .hex{ width:110px; height:126px; display:flex; align-items:center; justify-content:center; 
+        clip-path: polygon(25% 6.7%,75% 6.7%,100% 50%,75% 93.3%,25% 93.3%,0 50%);
+        border:1px solid #2b2b2b; background:linear-gradient(135deg,#A31F3433,#8A8B8C22); text-align:center; padding:10px; }
+  .hex__label{ font-size:12px; line-height:1.15; color:#e5e5e5; }
+  @media (max-width: 767px){ .hex{ width:100px; height:114px; } .hex-row.is-offset{ margin-left:50px; } }
+</style>
+
+<!-- 🔽 Put this JS after your data section (before other IIFEs), and DELETE the old
+     "Interest pills + meters" and "Simple radar canvas" blocks to avoid errors. -->
+<script>
+  // Data for Research Interests (short, professor-facing)
+  const researchInterestsBlocks = [
+    { title: "Distributed Energy Systems", desc: "Decentralized control, EMS/dispatch, and islanding for resilient microgrids." },
+    { title: "Hybrid Renewable Technology", desc: "PV–wind–hydrokinetic integration with maintenance-aware scheduling and TEA." },
+    { title: "Grid Tech: Resilience & Security", desc: "Converter-dominated grid interfaces, LVRT/FRT, cyber-robust ops." },
+    { title: "Power Electronics / EPS", desc: "MPPT, DC/DC, bus regulation, and CubeSat EPS under pulsed loads." },
+    { title: "ML for Power", desc: "Forecasting, diagnostics, and anomaly detection for microgrids & assets." },
+    { title: "Tools for Power R&D", desc: "Open TEA/EMS/HIL tooling to speed modeling → validation cycles." },
+    { title: "Power Semiconductors / PV", desc: "SCAPS‑1D/COMSOL device modeling; contact engineering for perovskites." },
+    { title: "Unmanned Electric Vehicles", desc: "AUVs, rockets, nanosats—closing the loop from models to fieldable hardware." },
+    { title: "Novel Generators", desc: "Floating mobile hybrid generator; solar vapor‑loop co‑gen; balanced submerged tube." }
+  ];
+
+  // Skills (shown as hex cells)
+  const essentialSkills = [
+    "Converter / EPS Design","Grid Resilience","CFD / COMSOL","TEA / HOMER Pro",
+    "SCAPS‑1D","MATLAB / Simulink","Python","Embedded / FPGA",
+    "ROS","Computer Vision","LaTeX","Git / Docker",
+    "ML / Forecasting","Power Device Modeling","Signal & Control","Lab Instrumentation"
+  ];
+
+  // Build Interest Blocks (left)
+  (function(){
+    const wrap = document.getElementById('interestBlocks');
+    if(!wrap) return;
+    researchInterestsBlocks.forEach(({title, desc}) => {
+      const card = document.createElement('div');
+      card.className = 'glass rounded-2xl p-4 border hover:border-zinc-600 transition-colors';
+      card.style.borderColor = '#2b2b2b';
+      const h = document.createElement('div'); h.className='font-semibold'; h.textContent=title; card.appendChild(h);
+      const p = document.createElement('p'); p.className='mt-1 text-sm text-zinc-300'; p.textContent=desc; card.appendChild(p);
+      wrap.appendChild(card);
+    });
+  })();
+
+  // Build Honeycomb (right)
+  (function(){
+    const host = document.getElementById('skillsHoneycomb');
+    if(!host) return;
+
+    function build(){
+      host.innerHTML = '';
+      const perRow = window.innerWidth < 768 ? 3 : 4; // responsive rows
+      for (let i=0; i<essentialSkills.length; i+=perRow){
+        const row = document.createElement('div');
+        row.className = 'hex-row' + ((Math.floor(i/perRow) % 2) ? ' is-offset' : '');
+        if(i>0) row.classList.add('mt-0'); // spacing controlled by CSS overlap
+        essentialSkills.slice(i, i+perRow).forEach(label => {
+          const cell = document.createElement('div');
+          cell.className = 'hex';
+          const span = document.createElement('div'); span.className='hex__label'; span.textContent = label; cell.appendChild(span);
+          row.appendChild(cell);
+        });
+        host.appendChild(row);
+      }
+    }
+
+    build();
+    window.addEventListener('resize', () => { clearTimeout(host.__r); host.__r = setTimeout(build, 120); });
+  })();
+</script>
 
   <!-- Experience (research + professional) -->
   <section id="experience" class="scroll-mt-32 relative py-8 md:py-12">
