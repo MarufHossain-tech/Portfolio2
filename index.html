@@ -95,42 +95,123 @@
     </div>
   </section>
 
-  <!-- Research Areas -->
-  <section id="interests" class="scroll-mt-32 relative py-8 md:py-12">
-    <div class="container mx-auto px-4">
-      <h2 class="text-2xl md:text-3xl font-bold tracking-tight">Research Areas</h2>
-      <div class="mt-8 grid md:grid-cols-3 gap-6">
-        <div class="glass rounded-2xl p-5 md:p-6 border md:col-span-2" style="border-color:#2b2b2b">
-          <div id="interestPills" class="flex flex-wrap"></div>
-          <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4" id="metersLeft"></div>
-        </div>
-        <div class="glass rounded-2xl p-5 md:p-6 border" style="border-color:#2b2b2b">
-          <div class="h-64" id="radarCanvasWrap">
-            <!-- simple canvas radar (no lib) -->
-            <canvas id="radarCanvas" width="360" height="260" style="width:100%; height:100%"></canvas>
-          </div>
-        </div>
+ <!-- DROP-IN REPLACEMENT for the entire <section id="interests"> ... </section> -->
+<section id="interests" class="scroll-mt-32 relative py-8 md:py-12">
+  <div class="container mx-auto px-4">
+    <h2 class="text-2xl md:text-3xl font-bold tracking-tight">Research & Skills</h2>
+    <div class="mt-8 grid md:grid-cols-3 gap-6">
+      <!-- LEFT: Research Interests (blocks) -->
+      <div class="glass rounded-2xl p-5 md:p-6 border md:col-span-2" style="border-color:#2b2b2b">
+        <h3 class="text-lg font-semibold mb-4">Research Interests</h3>
+        <div id="interestBlocks" class="grid sm:grid-cols-2 gap-4"></div>
       </div>
-    </div>
-  </section>
 
-  <!-- Experience (research + professional) -->
-  <section id="experience" class="scroll-mt-32 relative py-8 md:py-12">
-    <div class="container mx-auto px-4">
-      <h2 class="text-2xl md:text-3xl font-bold tracking-tight">Experience</h2>
-      <p class="mt-2 text-sm md:text-base text-zinc-300">Research first. Professional second.</p>
-      <div class="mt-6 grid md:grid-cols-2 gap-6">
-        <div>
-          <h4 class="font-semibold mb-4 flex items-center gap-2"><i data-lucide="brain"></i> Research Experience</h4>
-          <div id="researchExp"></div>
-        </div>
-        <div>
-          <h4 class="font-semibold mb-4 flex items-center gap-2"><i data-lucide="briefcase"></i> Professional Experience</h4>
-          <div id="professionalExp"></div>
-        </div>
+      <!-- RIGHT: Essential Skills (hex honeycomb) -->
+      <div class="glass rounded-2xl p-5 md:p-6 border" style="border-color:#2b2b2b">
+        <h3 class="text-lg font-semibold mb-4">Essential Skills</h3>
+        <div id="skillsHoneycomb" class="honey"></div>
+        <div id="skillsLegend" class="mt-3 text-xs text-neutral-400"></div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
+
+<!-- Add these styles inside your <style> block (keep your MIT palette vars) -->
+<style>
+  /* Interest blocks */
+  .interest-card{border:1px solid #2b2b2b; background:rgba(10,10,10,0.55)}
+  .interest-card h4{font-weight:600}
+  .interest-card ul{list-style:disc; padding-left:1.1rem}
+
+  /* Honeycomb */
+  .honey{display:flex; flex-direction:column; gap:10px; align-items:center}
+  .honey-row{display:flex; gap:10px}
+  .honey-row.offset{margin-left:34px}
+  .hex{width:68px; aspect-ratio:1/1; clip-path:polygon(25% 6.7%,75% 6.7%,100% 50%,75% 93.3%,25% 93.3%,0% 50%); border:1px solid #2b2b2b; display:flex; align-items:center; justify-content:center; padding:6px; text-align:center; font-size:10px; line-height:1.1; color:var(--mit-silver);}
+  .hex small{display:block; opacity:.8}
+  @media (min-width: 480px){ .hex{width:76px} .honey-row.offset{margin-left:38px} }
+  @media (min-width: 768px){ .hex{width:86px} .honey-row.offset{margin-left:43px} }
+</style>
+
+<!-- Add this script near your other scripts. Remove the OLD meters/radar builders. -->
+<script>
+  // ====== DATA ======
+  const ResearchInterests = [
+    { title:"Distributed Energy Systems", bullets:["Microgrids & EMS","Cyber‑resilience & security"] },
+    { title:"Hybrid Renewable Technology", bullets:["PV • Wind • Hydrokinetic","Maintenance‑aware scheduling"] },
+    { title:"Grid Technology", bullets:["Grid‑forming/Following interfaces","Fault ride‑through"] },
+    { title:"Power Electronics / EPS", bullets:["Converter/Inverter control","MPPT & pulsed‑load EPS"] },
+    { title:"ML in Power", bullets:["Forecasting & diagnostics","Dispatch optimization"] },
+    { title:"Tools for Research", bullets:["TEA/EMS/HIL frameworks","Open‑source workflows"] },
+    { title:"Semiconductor Modeling", bullets:["PV (SCAPS‑1D) • COMSOL","Power device modeling"] },
+    { title:"Unmanned Electric Vehicles", bullets:["AUV • Rocket • Nanosat","Energy‑aware autonomy"] },
+    { title:"Novel Generators (Original)", bullets:["Floating mobile hybrid","Solar vapor‑loop co‑gen","Balanced submerged tube"] },
+  ];
+
+  // name + level (1–5)
+  const EssentialSkills = [
+    { name:"Power Electronics", lvl:5 },
+    { name:"Converter/EPS Design", lvl:5 },
+    { name:"Grid Integration", lvl:4 },
+    { name:"Distributed Control", lvl:4 },
+    { name:"EMS/TEA/HIL", lvl:4 },
+    { name:"CFD / COMSOL", lvl:3 },
+    { name:"SCAPS‑1D", lvl:3 },
+    { name:"MATLAB", lvl:4 },
+    { name:"Python", lvl:4 },
+    { name:"C/C++", lvl:3 },
+    { name:"Rust", lvl:2 },
+    { name:"ML (CV/Time‑series)", lvl:3 },
+    { name:"ROS", lvl:3 },
+    { name:"FPGA/MCU", lvl:3 },
+    { name:"Tech Writing", lvl:4 },
+  ];
+
+  // ====== BUILD: Research Interest Blocks ======
+  (function buildInterestBlocks(){
+    const host = document.getElementById('interestBlocks');
+    host.innerHTML = '';
+    ResearchInterests.forEach(item => {
+      const card = document.createElement('div');
+      card.className = 'interest-card rounded-xl p-4';
+      const h4 = document.createElement('h4'); h4.className='text-sm mb-1'; h4.textContent=item.title; card.appendChild(h4);
+      const ul = document.createElement('ul'); ul.className='text-sm text-neutral-300 space-y-1';
+      (item.bullets||[]).forEach(b=>{ const li=document.createElement('li'); li.textContent=b; ul.appendChild(li); });
+      card.appendChild(ul); host.appendChild(card);
+    });
+  })();
+
+  // ====== BUILD: Hex Honeycomb ======
+  (function buildHoneycomb(){
+    const host = document.getElementById('skillsHoneycomb');
+    host.innerHTML = '';
+
+    // layout params
+    const perRow = 5; // base hexes per row
+    const rows = Math.ceil(EssentialSkills.length / perRow);
+
+    let idx = 0;
+    for (let r = 0; r < rows; r++) {
+      const row = document.createElement('div');
+      row.className = 'honey-row' + (r % 2 ? ' offset' : '');
+      for (let c = 0; c < perRow && idx < EssentialSkills.length; c++, idx++) {
+        const s = EssentialSkills[idx];
+        const hex = document.createElement('div');
+        hex.className = 'hex';
+        const alpha = 0.18 + (s.lvl * 0.12); // 1..5 → 0.3..0.78 approx
+        hex.style.background = `linear-gradient(135deg, rgba(163,31,52,${alpha}), rgba(138,139,140,0.18))`;
+        hex.title = `${s.name} • Level ${s.lvl}/5`;
+        hex.innerHTML = `<div><div>${s.name}</div><small>${'★'.repeat(s.lvl)}</small></div>`;
+        row.appendChild(hex);
+      }
+      host.appendChild(row);
+    }
+
+    const legend = document.getElementById('skillsLegend');
+    if (legend) legend.textContent = 'Shade intensity ≈ skill level (★=1–5).';
+  })();
+</script>
+
 
   <!-- Publications -->
   <section id="publications" class="scroll-mt-32 relative py-8 md:py-12">
@@ -229,14 +310,13 @@
   ];
 
   const meters = [
-    { label: "Decentralized Control", value: 78, detail: "Model-predictive and distributed control for hybrid microgrids; emphasis on stability with variable resources and pulsed loads.", img: "" },
-    { label: "Techno‑Economics", value: 82, detail: "TEA of riverine PV + hydrokinetic platforms, O&M windows, and storage sizing using HOMER Pro.", img: "" },
-    { label: "CFD/Physics Sim", value: 66, detail: "Flow-field modeling for hydrokinetic turbines; thermal and optical coupling for PV/perovskite stacks in COMSOL.", img: "" },
-    { label: "Photonics/Optics", value: 58, detail: "Free‑space optical downlink prototypes; optical path budgeting and modulation trade‑offs.", img: "" },
-    { label: "Embedded Systems", value: 80, detail: "MCU/FPGA prototypes for EPS and instrumentation; ROS-based data links; sensor fusion.", img: "" },
-    { label: "Computer Vision", value: 60, detail: "Object detection for AUV and environmental monitoring; dataset curation and classical CV pipelines.", img: "" },
-    { label: "Power Electronics", value: 72, detail: "MPPT, bus regulation, and converter control; HIL validation and efficiency tuning.", img: "" },
-    { label: "Scientific Writing", value: 80, detail: "Journal manuscripts, grant proposals, and reproducible documentation (LaTeX, Git).", img: "" }
+    { label: "Decentralized Energy System", value: 78, detail: "Model-predictive and distributed control for hybrid microgrids; emphasis on stability with variable resources and pulsed loads.", img: "" },
+    { label: "Technoeconomic Analysis of Renewable Systems", value: 82, detail: "TEA of riverine PV + hydrokinetic platforms, O&M windows, and storage sizing using HOMER Pro.", img: "" },
+    { label: "Semiconductor Modeling for Power Sector", value: 66, detail: "Nano-harvestors (i.e. PV, TENG etc) & Power Electronic Device Modeling", img: "" },
+    { label: "Unmanned Electric Robotic Vehicles", value: 58, detail: "Developed AUV, Sub-sonic Sounding Rocket, Nanosatellite", img: "" },
+    { label: "Power Electronics", value: 80, detail: "Converter, Inverter, Battery Management System and Electrical Power Systems Design. MPPT, bus regulation, and converter control; HIL validation and efficiency tuning.", img: "" },
+    { label: "AI implementation in Power Sector", value: 60, detail: "ML for forecasting, diagnostics, and dispatch.", img: "" },
+    { label: "Open Source Tool Developement", value: 80, detail: "Journal manuscripts, grant proposals, and reproducible documentation (LaTeX, Git).", img: "" }
   ];
 
   const radar = [
