@@ -106,78 +106,33 @@
         <div id="interestBlocks" class="grid sm:grid-cols-2 gap-4"></div>
       </div>
 
-      <!-- Add these styles to your <style> block (keep palette vars) -->
-<style>
-  /* Honeycomb groups */
-  .honey{display:flex; flex-direction:column; gap:18px}
-  .skill-group{border-top:1px solid #2b2b2b; padding-top:10px}
-  .skill-title{font-weight:600; font-size:0.95rem; margin-bottom:6px}
+      <!-- RIGHT: Essential Skills (hex honeycomb) -->
+      <div class="glass rounded-2xl p-5 md:p-6 border" style="border-color:#2b2b2b">
+        <h3 class="text-lg font-semibold mb-4">Essential Skills</h3>
+        <div id="skillsHoneycomb" class="honey"></div>
+        <div id="skillsLegend" class="mt-3 text-xs text-neutral-400"></div>
+      </div>
+    </div>
+  </div>
+</section>
 
-  /* Honeycomb layout */
-  .hc{display:flex; flex-direction:column; gap:10px; align-items:center}
-  .hc-row{display:flex; gap:10px}
-  .hc-row.offset{margin-left:38px}
-  .hex-cell{display:flex; flex-direction:column; align-items:center; width:86px}
-  .hex{width:86px; aspect-ratio:1/1; clip-path:polygon(25% 6.7%,75% 6.7%,100% 50%,75% 93.3%,25% 93.3%,0% 50%); border:1px solid #2b2b2b; background:linear-gradient(135deg, #a31f3433, #8A8B8C22); display:flex; align-items:center; justify-content:center; overflow:hidden}
-  .hex img{width:100%; height:100%; object-fit:cover}
-  .hex-cap{margin-top:6px; text-align:center; font-size:10px; line-height:1.15; color:var(--mit-silver)}
-  @media (max-width: 480px){ .hc-row.offset{margin-left:28px} .hex-cell,.hex{width:72px} }
+<!-- Add these styles inside your <style> block (keep your MIT palette vars) -->
+<style>
+  /* Interest blocks */
+  .interest-card{border:1px solid #2b2b2b; background:rgba(10,10,10,0.55)}
+  .interest-card h4{font-weight:600}
+  .interest-card ul{list-style:disc; padding-left:1.1rem}
+
+  /* Honeycomb */
+  .honey{display:flex; flex-direction:column; gap:10px; align-items:center}
+  .honey-row{display:flex; gap:10px}
+  .honey-row.offset{margin-left:34px}
+  .hex{width:68px; aspect-ratio:1/1; clip-path:polygon(25% 6.7%,75% 6.7%,100% 50%,75% 93.3%,25% 93.3%,0% 50%); border:1px solid #2b2b2b; display:flex; align-items:center; justify-content:center; padding:6px; text-align:center; font-size:10px; line-height:1.1; color:var(--mit-silver);}
+  .hex small{display:block; opacity:.8}
+  @media (min-width: 480px){ .hex{width:76px} .honey-row.offset{margin-left:38px} }
+  @media (min-width: 768px){ .hex{width:86px} .honey-row.offset{margin-left:43px} }
 </style>
 
-<!-- Replace ONLY the previous honeycomb builder <script> with this one -->
-<script>
-  // ====== GROUPED ESSENTIAL SKILLS (each hex holds a JPG; caption below) ======
-  const SkillGroups = [
-    { title: 'Programming Languages', items: ['Python','MATLAB/Simulink','C/C++','Rust'] },
-    { title: 'Design & Simulation Tools', items: ['Homer Pro','PowerSim','Proteus','COMSOL Multiphysics'] },
-    { title: 'Hardware Skills', items: ['Arduino IDE','Raspberry Pi','ESP-32','Sensors'] },
-    { title: 'Research Tools', items: ['Docker','Git','GitHub','LaTeX'] },
-    { title: 'Soft Skills', items: ['Technical Writing','Grant Writing','Mentoring','Leadership','Public Speaking','Critical Thinking','Problem Solving'] },
-  ];
-
-  // Build groups into #skillsHoneycomb (right column). Images are loaded from "<name>.jpg"
-  (function buildGroupedHoneycomb(){
-    const host = document.getElementById('skillsHoneycomb');
-    host.innerHTML = '';
-
-    // helper: create rows with offset for honeycomb
-    function makeHoney(items){
-      const wrap = document.createElement('div'); wrap.className = 'hc';
-      const perRow = 4; // hexes per row; second row offset
-      let i = 0; let rowIndex = 0;
-      while (i < items.length){
-        const row = document.createElement('div');
-        row.className = 'hc-row' + (rowIndex % 2 ? ' offset' : '');
-        for (let c = 0; c < perRow && i < items.length; c++, i++){
-          const name = items[i];
-          const cell = document.createElement('div'); cell.className = 'hex-cell';
-          const hex = document.createElement('div'); hex.className = 'hex';
-          const img = document.createElement('img');
-          img.src = encodeURI(`${name}.jpg`); // place JPGs next to index.html; e.g., "Python.jpg"
-          img.alt = name;
-          img.onerror = () => { // graceful placeholder if missing
-            hex.style.background = 'linear-gradient(135deg,#a31f3433,#8A8B8C22)';
-            if (img.parentNode) img.parentNode.removeChild(img);
-          };
-          hex.appendChild(img);
-          const cap = document.createElement('div'); cap.className = 'hex-cap'; cap.textContent = name;
-          cell.appendChild(hex); cell.appendChild(cap); row.appendChild(cell);
-        }
-        wrap.appendChild(row); rowIndex++;
-      }
-      return wrap;
-    }
-
-    SkillGroups.forEach(group => {
-      const g = document.createElement('div'); g.className = 'skill-group';
-      const h = document.createElement('div'); h.className = 'skill-title'; h.textContent = group.title; g.appendChild(h);
-      g.appendChild(makeHoney(group.items)); host.appendChild(g);
-    });
-
-    const legend = document.getElementById('skillsLegend');
-    if (legend) legend.textContent = 'Add JPGs named exactly as the skill (e.g., "Python.jpg", "MATLAB_Simulink.jpg" if you prefer underscores).';
-  })();
-</script>
 <!-- Add this script near your other scripts. Remove the OLD meters/radar builders. -->
 <script>
   // ====== DATA ======
