@@ -340,62 +340,41 @@
 // (e.g., SDG 7.jpg, SDG 9.jpg ...). Falls back to a colored label if the file is missing.
 
 // ---------- SDG grid with local images ----------
+// ---------- SDG grid (static images, no labels) ----------
 (function(){
-  const host = byId('sdgGrid');
-  const goals = [
-    { id: 4,  label: 'Quality Education' },
-    { id: 7,  label: 'Clean Energy' },
-    { id: 9,  label: 'Industry & Innovation' },
-    { id: 11, label: 'Sustainable Cities' },
-    { id: 13, label: 'Climate Action' },
-    { id: 14, label: 'Life Below Water' }
-  ];
+  const host = document.getElementById('sdgGrid');
+  // Use your kept goals only (removed SDG 4):
+  const goalIds = [7, 9, 11, 6, 13, 14];
 
   const grid = document.createElement('div');
   grid.className = 'grid grid-cols-3 sm:grid-cols-6 gap-3';
 
-  goals.forEach((g) => {
+  goalIds.forEach((id) => {
     const box = document.createElement('div');
-    box.className = 'rounded-xl border flex flex-col items-center justify-center px-2 py-2 text-center';
+    box.className = 'rounded-xl border flex items-center justify-center p-2';
     box.style.borderColor = '#2b2b2b';
     box.style.background = '#a31f3410';
     box.style.height = '84px';
 
-    const imgWrap = document.createElement('div');
-    imgWrap.className = 'w-12 h-12 rounded-lg overflow-hidden flex items-center justify-center border bg-black/20';
-    imgWrap.style.borderColor = '#2b2b2b';
-
     const img = document.createElement('img');
-    img.alt = g.label;
-    img.className = 'w-full h-full object-contain';
-    img.src = `SDG ${g.id}.jpg`;
+    img.src = encodeURI(`SDG ${id}.jpg`); // e.g., "SDG 7.jpg"
+    img.alt = `SDG ${id}`;
+    img.className = 'max-h-full max-w-full object-contain';
+    // graceful fallback if a file is missing
     img.onerror = () => {
-      img.remove();
-      const fallback = document.createElement('div');
-      fallback.className = 'text-xs font-bold';
-      fallback.style.color = 'white';
-      fallback.textContent = `SDG ${g.id}`;
-      imgWrap.style.background = 'var(--mit-red)';
-      imgWrap.appendChild(fallback);
+      const ph = document.createElement('div');
+      ph.className = 'w-full h-full';
+      ph.style.background = 'linear-gradient(135deg,#a31f3433,#8A8B8C22)';
+      box.replaceChildren(ph);
     };
 
-    imgWrap.appendChild(img);
-
-    const label = document.createElement('div');
-    label.className = 'mt-2 text-[11px] leading-tight';
-    label.style.color = 'var(--mit-silver)';
-    label.textContent = g.label;
-
-    box.appendChild(imgWrap);
-    box.appendChild(label);
+    box.appendChild(img);
     grid.appendChild(box);
   });
 
   host.innerHTML = '';
   host.appendChild(grid);
 })();
-
-
   // ---------- Featured cards ----------
   (function(){
     const host=byId('featuredGrid');
