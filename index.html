@@ -335,40 +335,66 @@
   },{rootMargin:'-40% 0px -55% 0px',threshold:[0,0.2,0.5,1]});
   NAV.forEach(n=>{const el=document.getElementById(n.id); if(el) obs.observe(el)});
 
-  // ---------- SDG grid with upload ----------
-  (function(){
-    const host=byId('sdgGrid');
-    const goals=[
-      { id: 4, label: 'Quality Education' },
-      { id: 7, label: 'Clean Energy' },
-      { id: 9, label: 'Industry & Innovation' },
-      { id: 11, label: 'Sustainable Cities' },
-      { id: 13, label: 'Climate Action' },
-      { id: 14, label: 'Life Below Water' }
-    ];
-    const grid=document.createElement('div'); grid.className='grid grid-cols-3 sm:grid-cols-6 gap-3';
-    const icons=new Array(goals.length).fill(null);
-    goals.forEach((g,i)=>{
-      const box=document.createElement('div');
-      box.className='rounded-xl border flex flex-col items-center justify-center px-2 py-2 text-center';
-      box.style.borderColor='#2b2b2b'; box.style.background='#a31f3410'; box.style.height='84px';
-      const imgWrap=document.createElement('div'); imgWrap.className='w-12 h-12 rounded-lg overflow-hidden flex items-center justify-center border'; imgWrap.style.borderColor='#2b2b2b'; imgWrap.style.background='var(--mit-red)';
-      const txt=document.createElement('div'); txt.className='text-xs font-bold'; txt.style.color='white'; txt.textContent='SDG '+g.id;
-      imgWrap.appendChild(txt); box.appendChild(imgWrap);
-      const label=document.createElement('div'); label.className='mt-2 text-[11px] leading-tight'; label.style.color='var(--mit-silver)'; label.textContent=g.label; box.appendChild(label);
-      grid.appendChild(box);
-      icons[i]={box,imgWrap};
-    });
-    host.appendChild(grid);
+// Replace your existing "SDG grid with upload" IIFE with this one
+// It loads icons from files named exactly: "SDG <ID>.jpg" in the same folder as index.html
+// (e.g., SDG 7.jpg, SDG 9.jpg ...). Falls back to a colored label if the file is missing.
 
-    const row=document.createElement('div'); row.className='mt-2 flex items-center gap-2';
-    const btn=document.createElement('button'); btn.className='px-2.5 py-1.5 rounded-md text-xs border'; btn.style.borderColor='var(--mit-red)'; btn.style.background='#a31f3422'; btn.style.color='white'; btn.textContent='Upload SDG icons';
-    const tip=document.createElement('div'); tip.className='text-[11px] opacity-70'; tip.style.color='var(--mit-silver)'; tip.textContent='Tip: provide 6 square PNG/SVG files for symmetry.';
-    const input=document.createElement('input'); input.type='file'; input.accept='image/*'; input.multiple=true; input.className='hidden';
-    btn.onclick=()=>input.click();
-    input.onchange=(e)=>{ const files=[...e.target.files].slice(0,icons.length); files.forEach((f,i)=>{ const url=URL.createObjectURL(f); const img=document.createElement('img'); img.src=url; img.className='w-full h-full object-contain'; icons[i].imgWrap.innerHTML=''; icons[i].imgWrap.style.background='transparent'; icons[i].imgWrap.appendChild(img); }); };
-    row.appendChild(btn); row.appendChild(input); row.appendChild(tip); host.appendChild(row);
-  })();
+// ---------- SDG grid with local images ----------
+(function(){
+  const host = byId('sdgGrid');
+  const goals = [
+    { id: 4,  label: 'Quality Education' },
+    { id: 7,  label: 'Clean Energy' },
+    { id: 9,  label: 'Industry & Innovation' },
+    { id: 11, label: 'Sustainable Cities' },
+    { id: 13, label: 'Climate Action' },
+    { id: 14, label: 'Life Below Water' }
+  ];
+
+  const grid = document.createElement('div');
+  grid.className = 'grid grid-cols-3 sm:grid-cols-6 gap-3';
+
+  goals.forEach((g) => {
+    const box = document.createElement('div');
+    box.className = 'rounded-xl border flex flex-col items-center justify-center px-2 py-2 text-center';
+    box.style.borderColor = '#2b2b2b';
+    box.style.background = '#a31f3410';
+    box.style.height = '84px';
+
+    const imgWrap = document.createElement('div');
+    imgWrap.className = 'w-12 h-12 rounded-lg overflow-hidden flex items-center justify-center border bg-black/20';
+    imgWrap.style.borderColor = '#2b2b2b';
+
+    const img = document.createElement('img');
+    img.alt = g.label;
+    img.className = 'w-full h-full object-contain';
+    img.src = `SDG ${g.id}.jpg`;
+    img.onerror = () => {
+      img.remove();
+      const fallback = document.createElement('div');
+      fallback.className = 'text-xs font-bold';
+      fallback.style.color = 'white';
+      fallback.textContent = `SDG ${g.id}`;
+      imgWrap.style.background = 'var(--mit-red)';
+      imgWrap.appendChild(fallback);
+    };
+
+    imgWrap.appendChild(img);
+
+    const label = document.createElement('div');
+    label.className = 'mt-2 text-[11px] leading-tight';
+    label.style.color = 'var(--mit-silver)';
+    label.textContent = g.label;
+
+    box.appendChild(imgWrap);
+    box.appendChild(label);
+    grid.appendChild(box);
+  });
+
+  host.innerHTML = '';
+  host.appendChild(grid);
+})();
+
 
   // ---------- Featured cards ----------
   (function(){
