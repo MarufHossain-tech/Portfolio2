@@ -98,7 +98,7 @@
 <!-- 🔁 REPLACE your entire <section id="interests">...</section> with this block -->
 <section id="interests" class="scroll-mt-32 relative py-8 md:py-12">
   <div class="container mx-auto px-4">
-    <h2 class="text-2xl md:text-3xl font-bold tracking-tight">Research Idea Map</h2>
+    <h2 class="text-2xl md:text-3xl font-bold tracking-tight"> Research Core & Interest </h2>
     <p class="mt-2 text-sm text-zinc-300">All threads originate from a single concept: a <span class="font-semibold">Floating Hybrid Renewable Microgrid Robot</span> that repositions based on <span class="font-semibold">flash‑flood</span>, <span class="font-semibold">debris/soiling rate</span>, and <span class="font-semibold">island growth</span>.</p>
 
     <div id="ideaMap" class="relative mt-8 h-[540px] md:h-[640px]">
@@ -219,23 +219,200 @@
   })();
 </script>
  
-  <!-- Experience (research + professional) -->
-  <section id="experience" class="scroll-mt-32 relative py-8 md:py-12">
-    <div class="container mx-auto px-4">
-      <h2 class="text-2xl md:text-3xl font-bold tracking-tight">Experience</h2>
-      <p class="mt-2 text-sm md:text-base text-zinc-300">Research first. Professional second.</p>
-      <div class="mt-6 grid md:grid-cols-2 gap-6">
-        <div>
-          <h4 class="font-semibold mb-4 flex items-center gap-2"><i data-lucide="brain"></i> Research Experience</h4>
-          <div id="researchExp"></div>
-        </div>
-        <div>
-          <h4 class="font-semibold mb-4 flex items-center gap-2"><i data-lucide="briefcase"></i> Professional Experience</h4>
-          <div id="professionalExp"></div>
-        </div>
-      </div>
+ <!-- 🔁 REPLACE your entire <section id="experience">...</section> with this block -->
+<section id="experience" class="scroll-mt-32 relative py-8 md:py-12">
+  <div class="container mx-auto px-4">
+    <h2 class="text-2xl md:text-3xl font-bold tracking-tight">Experience</h2>
+    <p class="mt-2 text-sm md:text-base text-zinc-300">Click timeline nodes to see details and media.</p>
+
+    <div id="expTimeline" class="mt-8 relative">
+      <!-- thick rail -->
+      <div class="tl-rail" aria-hidden></div>
+      <!-- nodes get injected here -->
+      <div id="tlNodes"></div>
+      <!-- floating details panel -->
+      <div id="tlPanel" class="hidden"></div>
     </div>
-  </section>
+  </div>
+</section>
+
+<!-- ➕ Add these styles inside your <style> in <head> (keep existing vars) -->
+<style>
+  /* ===== Thick Timeline ===== */
+  #expTimeline{ min-height: 680px; }
+  .tl-rail{ position:absolute; left:50%; top:0; transform:translateX(-50%);
+    width:14px; height:100%; border-radius:999px; border:1px solid #2b2b2b;
+    background: linear-gradient(180deg, #1a1a1a, #2a2a2a);
+    box-shadow: inset 0 0 0 2px rgba(163,31,52,.12);
+  }
+  .tl-node{ position:absolute; top:0; width:18px; height:18px; border-radius:999px; border:2px solid #A31F34; background:#111; 
+    transform:translate(-50%, -50%); box-shadow:0 0 0 4px rgba(163,31,52,.18);
+  }
+  .tl-node button{ position:absolute; inset:-18px; border-radius:999px; }
+  .tl-node::after{ content:''; position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+    width:8px; height:8px; border-radius:999px; background:#A31F34; }
+  .tl-node.is-active{ box-shadow:0 0 0 6px rgba(163,31,52,.35); }
+
+  /* floating panel */
+  #tlPanel{ position:absolute; z-index:30; width:min(540px, 44vw);
+    background:rgba(10,10,10,.72); backdrop-filter: blur(10px);
+    border:1px solid #2b2b2b; border-radius:18px; padding:14px; color:#e5e5e5;
+    box-shadow: 0 12px 40px rgba(0,0,0,.45);
+  }
+  #tlPanel .hdr{ display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
+  #tlPanel .org{ font-weight:700; }
+  #tlPanel .sub{ opacity:.8; font-size:.9rem; }
+  #tlPanel .bul{ margin-top:.5rem; padding-left:1.1rem; }
+  #tlPanel .grid{ margin-top:.65rem; gap:.5rem; }
+  #tlPanel .ph{ background: linear-gradient(135deg, #A31F3433, #8A8B8C22); height:100%; width:100%; border-radius:10px; border:1px solid #2b2b2b; }
+
+  /* tiny connector line from node to panel */
+  .tl-connector{ position:absolute; height:2px; background:#A31F34; opacity:.6; }
+
+  /* Mobile: left-aligned rail */
+  @media (max-width: 767px){
+    .tl-rail{ left:22px; transform:none; width:10px; }
+    .tl-node{ left:27px !important; }
+    #tlPanel{ width:min(92vw, 560px); left:64px !important; transform:none !important; }
+  }
+</style>
+
+<!-- 🔽 Put this JS near your other builders. Remove/disable your old Experience card builder to avoid duplicates. -->
+<script>
+  (function(){
+    // 1) Combine your existing data arrays. Optionally attach image arrays to items.
+    // Example image hints (edit/keep as you have files):
+    // researchExp[0].images = ["brac-1.jpg","brac-2.jpg"]; 
+    // researchExp[1].images = ["mcgill-1.jpg","mcgill-2.jpg"]; 
+    // researchExp[2].images = ["austsat-1.jpg","austsat-2.jpg","austsat-3.jpg"]; 
+    // professional[0].images = ["alfatah-1.jpg"]; 
+
+    const MONTHS = {jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};
+    function parseStart(period){
+      // e.g., "Oct 2024 – Present"
+      if(!period) return new Date(1970,0,1);
+      const m = period.match(/([A-Za-z]{3})\s+(\d{4})/);
+      if(!m) return new Date(1970,0,1);
+      const mm = (m[1]||'jan').slice(0,3).toLowerCase();
+      const yy = parseInt(m[2],10)||1970;
+      return new Date(yy, (mm in MONTHS? MONTHS[mm]:0), 1);
+    }
+
+    const timeline = [
+      ...(Array.isArray(researchExp)? researchExp.map(x=>({ ...x, kind:'Research' })) : []),
+      ...(Array.isArray(professional)? professional.map(x=>({ ...x, kind:'Professional' })) : []),
+    ].sort((a,b)=> parseStart(b.period) - parseStart(a.period));
+
+    const host = document.getElementById('expTimeline');
+    const nodesLayer = document.getElementById('tlNodes');
+    const panel = document.getElementById('tlPanel');
+
+    // Set container height based on items (spacing 140px each)
+    const SPACING = 140; host.style.minHeight = (Math.max(timeline.length, 5) * SPACING) + 'px';
+
+    let activeIndex = -1; let connectorEl = null;
+
+    function closePanel(){
+      panel.classList.add('hidden');
+      if(connectorEl && connectorEl.parentNode) connectorEl.parentNode.removeChild(connectorEl);
+      connectorEl = null;
+      // remove active ring
+      [...nodesLayer.querySelectorAll('.tl-node')].forEach(n=>n.classList.remove('is-active'));
+      activeIndex = -1;
+    }
+
+    function showPanel(idx){
+      const item = timeline[idx]; if(!item) return;
+      const node = nodesLayer.querySelector(`[data-i="${idx}"]`);
+      if(!node) return;
+
+      // mark active
+      [...nodesLayer.querySelectorAll('.tl-node')].forEach(n=>n.classList.remove('is-active'));
+      node.classList.add('is-active');
+
+      // Side selection: alternate left/right
+      const isLeft = (idx % 2 === 0);
+      const rectHost = host.getBoundingClientRect();
+      const nRect = node.getBoundingClientRect();
+      const top = node.offsetTop - 8; // align with node center
+
+      panel.innerHTML = '';
+      const wrap = document.createElement('div');
+      wrap.innerHTML = `
+        <div class="hdr">
+          <div>
+            <div class="org">${item.org}</div>
+            <div class="sub">${item.role || ''}${item.period? ' · '+item.period: ''}${item.kind? ' · '+item.kind: ''}</div>
+          </div>
+          <button aria-label="Close" class="p-1 rounded hover:bg-white/5" id="tlClose">✕</button>
+        </div>
+        ${Array.isArray(item.bullets) && item.bullets.length? `<ul class="bul list-disc text-sm text-neutral-300">${item.bullets.map(b=>`<li>${b}</li>`).join('')}</ul>` : ''}
+        ${item.long? `<p class="mt-2 text-sm text-neutral-300">${item.long}</p>`:''}
+        <div class="grid grid-cols-2 md:grid-cols-3">
+          ${Array.isArray(item.images) && item.images.length? item.images.slice(0,6).map(src=>`
+            <div class="rounded-lg overflow-hidden border" style="border-color:#262626">
+              <img src="${src}" alt="${item.org}" class="w-full h-full object-cover"/>
+            </div>`).join('') :
+            `<div class="ph col-span-2 md:col-span-3"></div>`}
+        </div>`;
+      panel.appendChild(wrap);
+
+      // position panel
+      panel.style.top = Math.max(8, top - 8) + 'px';
+      if(window.innerWidth < 768){
+        // mobile: fixed left
+        panel.style.left = '64px';
+        panel.style.transform = 'none';
+      } else {
+        const offset = 24; // gap from rail
+        if(isLeft){ panel.style.left = 'calc(50% - 24px)'; panel.style.transform = `translate(-100%, 0)`; }
+        else{ panel.style.left = 'calc(50% + '+offset+'px)'; panel.style.transform = `translate(0, 0)`; }
+      }
+      panel.classList.remove('hidden');
+
+      // connector line
+      if(connectorEl && connectorEl.parentNode) connectorEl.parentNode.removeChild(connectorEl);
+      connectorEl = document.createElement('div'); connectorEl.className = 'tl-connector';
+      const railX = (window.innerWidth < 768)? 27 : (host.clientWidth/2);
+      const fromX = railX; const fromY = node.offsetTop - 1;
+      const toX = (window.innerWidth < 768)? (64) : (isLeft? panel.offsetLeft + panel.offsetWidth : panel.offsetLeft);
+      const toY = panel.offsetTop + 16; // near top
+      const left = Math.min(fromX, toX); const width = Math.abs(toX - fromX);
+      connectorEl.style.left = left + 'px'; connectorEl.style.top = fromY + 'px'; connectorEl.style.width = (width) + 'px';
+      host.appendChild(connectorEl);
+
+      // listeners
+      document.getElementById('tlClose').onclick = closePanel;
+      activeIndex = idx;
+    }
+
+    function buildNodes(){
+      nodesLayer.innerHTML = '';
+      timeline.forEach((item, i)=>{
+        const y = (i+1) * SPACING; // even spacing
+        const n = document.createElement('div'); n.className = 'tl-node';
+        n.style.top = y + 'px';
+        // center rail default
+        n.style.left = (window.innerWidth < 768? 27 : (host.clientWidth/2)) + 'px';
+        n.dataset.i = i;
+        const b = document.createElement('button'); b.title = `${item.org}`; b.onclick = ()=> showPanel(i); n.appendChild(b);
+        nodesLayer.appendChild(n);
+      });
+    }
+
+    buildNodes();
+    window.addEventListener('resize', ()=>{ clearTimeout(host.__r); host.__r = setTimeout(()=>{ buildNodes(); if(activeIndex>=0) showPanel(activeIndex); }, 120); });
+
+    // Close on outside click
+    document.addEventListener('click', (e)=>{
+      if(!panel.classList.contains('hidden')){
+        const inside = panel.contains(e.target) || 
+                       (e.target.closest && e.target.closest('.tl-node'));
+        if(!inside) closePanel();
+      }
+    });
+  })();
+</script>
 
   <!-- Publications -->
   <section id="publications" class="scroll-mt-32 relative py-8 md:py-12">
