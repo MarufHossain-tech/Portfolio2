@@ -95,127 +95,100 @@
     </div>
   </section>
 
-<!-- 🔁 REPLACE your entire <section id="interests">...</section> with this block -->
+  <!-- 🔁 REPLACE your entire <section id="interests">...</section> with this block -->
 <section id="interests" class="scroll-mt-32 relative py-8 md:py-12">
   <div class="container mx-auto px-4">
-    <h2 class="text-2xl md:text-3xl font-bold tracking-tight">Research Idea Map</h2>
-    <p class="mt-2 text-sm text-zinc-300">All threads originate from a single concept: a <span class="font-semibold">Floating Hybrid Renewable Microgrid Robot</span> that repositions based on <span class="font-semibold">flash‑flood</span>, <span class="font-semibold">debris/soiling rate</span>, and <span class="font-semibold">island growth</span>.</p>
+    <h2 class="text-2xl md:text-3xl font-bold tracking-tight">Research Focus</h2>
+    <div class="mt-8 grid md:grid-cols-2 gap-6">
 
-    <div id="ideaMap" class="relative mt-8 h-[540px] md:h-[640px]">
-      <svg id="ideaMapSvg" class="absolute inset-0 w-full h-full" aria-hidden></svg>
-      <div id="ideaNodes" class="absolute inset-0"></div>
-      <div id="ideaTip" class="hidden absolute z-50 max-w-xs rounded-lg border p-3 text-sm bg-black/70" style="border-color:#2b2b2b"></div>
+      <!-- LEFT: Research Interests (cards/blocks) -->
+      <div id="interestBlocks" class="grid sm:grid-cols-2 gap-4"></div>
+
+      <!-- RIGHT: Essential Skills (hexagonal honeycomb) -->
+      <div>
+        <h3 class="text-lg font-semibold mb-3">Essential Skills</h3>
+        <div id="skillsHoneycomb"></div>
+      </div>
+
     </div>
   </div>
 </section>
 
-<!-- ➕ Add these styles to your <style> block in <head> (keep existing vars) -->
+<!-- ➕ Add these styles inside <style> in <head> (keep your existing vars) -->
 <style>
-  .node{ position:absolute; transform:translate(-50%,-50%); padding:.65rem .8rem; border-radius:14px; border:1px solid #2b2b2b; backdrop-filter:blur(8px); background:rgba(10,10,10,.55); color:#e5e5e5; text-align:center; line-height:1.15; }
-  .node--core{ font-weight:700; box-shadow:0 0 0 2px #A31F3444; }
-  .node--driver{ font-weight:600; }
-  .edge{ stroke:#7a7a7a; stroke-opacity:.65; stroke-width:1.2; }
-  .edge--highlight{ stroke:#A31F34; stroke-width:1.6; stroke-opacity:.9; }
+  /* --- Hex Honeycomb --- */
+  .hex-row{ display:flex; justify-content:center; gap:18px; }
+  .hex-row + .hex-row{ margin-top:-36px; } /* overlap rows for honeycomb effect */
+  .hex-row.is-offset{ margin-left:55px; } /* indent every other row */
+  .hex{ width:110px; height:126px; display:flex; align-items:center; justify-content:center; 
+        clip-path: polygon(25% 6.7%,75% 6.7%,100% 50%,75% 93.3%,25% 93.3%,0 50%);
+        border:1px solid #2b2b2b; background:linear-gradient(135deg,#A31F3433,#8A8B8C22); text-align:center; padding:10px; }
+  .hex__label{ font-size:12px; line-height:1.15; color:#e5e5e5; }
+  @media (max-width: 767px){ .hex{ width:100px; height:114px; } .hex-row.is-offset{ margin-left:50px; } }
 </style>
 
-<!-- 🔽 Put this JS after your data section. Also DELETE old code that built pills/meters/radar. -->
+<!-- 🔽 Put this JS after your data section (before other IIFEs), and DELETE the old
+     "Interest pills + meters" and "Simple radar canvas" blocks to avoid errors. -->
 <script>
+  // Data for Research Interests (short, professor-facing)
+  const researchInterestsBlocks = [
+    { title: "Distributed Energy Systems", desc: "Decentralized control, EMS/dispatch, and islanding for resilient microgrids." },
+    { title: "Hybrid Renewable Technology", desc: "PV–wind–hydrokinetic integration with maintenance-aware scheduling and TEA." },
+    { title: "Grid Tech: Resilience & Security", desc: "Converter-dominated grid interfaces, LVRT/FRT, cyber-robust ops." },
+    { title: "Power Electronics / EPS", desc: "MPPT, DC/DC, bus regulation, and CubeSat EPS under pulsed loads." },
+    { title: "ML for Power", desc: "Forecasting, diagnostics, and anomaly detection for microgrids & assets." },
+    { title: "Tools for Power R&D", desc: "Open TEA/EMS/HIL tooling to speed modeling → validation cycles." },
+    { title: "Power Semiconductors / PV", desc: "SCAPS‑1D/COMSOL device modeling; contact engineering for perovskites." },
+    { title: "Unmanned Electric Vehicles", desc: "AUVs, rockets, nanosats—closing the loop from models to fieldable hardware." },
+    { title: "Novel Generators", desc: "Floating mobile hybrid generator; solar vapor‑loop co‑gen; balanced submerged tube." }
+  ];
+
+  // Skills (shown as hex cells)
+  const essentialSkills = [
+    "Converter / EPS Design","Grid Resilience","CFD / COMSOL","TEA / HOMER Pro",
+    "SCAPS‑1D","MATLAB / Simulink","Python","Embedded / FPGA",
+    "ROS","Computer Vision","LaTeX","Git / Docker",
+    "ML / Forecasting","Power Device Modeling","Signal & Control","Lab Instrumentation"
+  ];
+
+  // Build Interest Blocks (left)
   (function(){
-    const el = document.getElementById('ideaMap');
-    const svg = document.getElementById('ideaMapSvg');
-    const layer = document.getElementById('ideaNodes');
-    const tip = document.getElementById('ideaTip');
+    const wrap = document.getElementById('interestBlocks');
+    if(!wrap) return;
+    researchInterestsBlocks.forEach(({title, desc}) => {
+      const card = document.createElement('div');
+      card.className = 'glass rounded-2xl p-4 border hover:border-zinc-600 transition-colors';
+      card.style.borderColor = '#2b2b2b';
+      const h = document.createElement('div'); h.className='font-semibold'; h.textContent=title; card.appendChild(h);
+      const p = document.createElement('p'); p.className='mt-1 text-sm text-zinc-300'; p.textContent=desc; card.appendChild(p);
+      wrap.appendChild(card);
+    });
+  })();
 
-    const core = {
-      id:'core',
-      label:'Floating Hybrid Renewable\nMicrogrid Robot',
-      desc:'Mobile hybrid generation platform; repositions with hydrology & morphology signals to maximize energy, water access, and resilience.'
-    };
+  // Build Honeycomb (right)
+  (function(){
+    const host = document.getElementById('skillsHoneycomb');
+    if(!host) return;
 
-    const drivers = [
-      { id:'flood',   label:'Flash‑Flood Sensing', desc:'Hydrology nowcasting; gauges, radar, and pressure probes trigger relocation.' },
-      { id:'debris',  label:'Debris / Soiling Rate', desc:'Litter/silt sensors, PV soiling metrics \u2192 maintenance windows & cleaning.' },
-      { id:'island',  label:'Island Growth', desc:'Remote sensing for channel morphology; habitat‑aware siting & routing.' },
-    ];
-
-    const domains = [
-      { id:'des',   label:'Distributed Energy Systems', desc:'EMS/dispatch, islanding, black‑start, mobility‑aware siting.' },
-      { id:'hrt',   label:'Hybrid Renewable Tech',      desc:'PV + HKT + wind integration; storage & maintenance scheduling.' },
-      { id:'grid',  label:'Grid Resilience & Security', desc:'Converter‑dominated interfaces, LVRT/FRT, cyber‑robust ops.' },
-      { id:'pe',    label:'Converter / EPS Design',     desc:'MPPT, DC/DC, bus regulation, pulsed‑load tolerance.' },
-      { id:'ml',    label:'ML for Power',               desc:'Forecasting, diagnostics, anomaly detection for dispatch.' },
-      { id:'tools', label:'Tools for Power R&D',        desc:'Open TEA/EMS/HIL to compress model \u2192 hardware cycles.' },
-      { id:'semi',  label:'Power Semiconductors / PV',  desc:'SCAPS‑1D/COMSOL device models; contact engineering.' },
-      { id:'auv',   label:'Unmanned Electric Platforms',desc:'AUV/rocket/nanosat EPS; telemetry and field validation.' },
-      { id:'novel', label:'Novel Generators',           desc:'Floating hybrid gen, solar vapor‑loop co‑gen, submerged tube.' },
-    ];
-
-    // layout
     function build(){
-      const rect = el.getBoundingClientRect();
-      const W = rect.width, H = rect.height; const cx = W/2, cy = H/2;
-      const r1 = Math.min(W,H) * 0.28;  // drivers ring
-      const r2 = Math.min(W,H) * 0.44;  // domains ring
-
-      // clear
-      svg.innerHTML = '';
-      layer.innerHTML = '';
-
-      // draw edges helper
-      function line(x1,y1,x2,y2,cls){
-        const path = document.createElementNS('http://www.w3.org/2000/svg','line');
-        path.setAttribute('x1',x1); path.setAttribute('y1',y1);
-        path.setAttribute('x2',x2); path.setAttribute('y2',y2);
-        path.setAttribute('class','edge '+(cls||''));
-        svg.appendChild(path);
-        return path;
+      host.innerHTML = '';
+      const perRow = window.innerWidth < 768 ? 3 : 4; // responsive rows
+      for (let i=0; i<essentialSkills.length; i+=perRow){
+        const row = document.createElement('div');
+        row.className = 'hex-row' + ((Math.floor(i/perRow) % 2) ? ' is-offset' : '');
+        if(i>0) row.classList.add('mt-0'); // spacing controlled by CSS overlap
+        essentialSkills.slice(i, i+perRow).forEach(label => {
+          const cell = document.createElement('div');
+          cell.className = 'hex';
+          const span = document.createElement('div'); span.className='hex__label'; span.textContent = label; cell.appendChild(span);
+          row.appendChild(cell);
+        });
+        host.appendChild(row);
       }
-
-      // add node helper
-      function node(x,y,label,desc,kind){
-        const n = document.createElement('button');
-        n.className = 'node '+(kind?('node--'+kind):'');
-        n.style.left = x+'px'; n.style.top = y+'px';
-        n.innerHTML = label.replaceAll('\n','<br/>');
-        n.onmouseenter = (e)=>{ tip.textContent = desc||''; tip.style.left = (x+14)+'px'; tip.style.top = (y+14)+'px'; tip.classList.remove('hidden'); };
-        n.onmouseleave = ()=> tip.classList.add('hidden');
-        n.onclick = ()=>{ // highlight edges touching this node
-          [...svg.querySelectorAll('.edge')].forEach(e=>e.setAttribute('class','edge'));
-          const hit = n.__edges || []; hit.forEach(e=> e.setAttribute('class','edge edge--highlight'));
-        };
-        layer.appendChild(n); return n;
-      }
-
-      // core node
-      const coreBtn = node(cx, cy, core.label, core.desc, 'core');
-
-      // driver nodes around
-      const dAng = Math.PI*2 / drivers.length; const dStart = -Math.PI/2; // start top
-      const driverButtons = drivers.map((d,i)=>{
-        const a = dStart + i*dAng; const x = cx + Math.cos(a)*r1; const y = cy + Math.sin(a)*r1;
-        const btn = node(x,y,d.label,d.desc,'driver');
-        const e = line(cx,cy,x,y); btn.__edges = [e]; coreBtn.__edges = (coreBtn.__edges||[]).concat(e);
-        return {btn,x,y};
-      });
-
-      // domain nodes outer ring
-      const nAng = Math.PI*2 / domains.length; const nStart = -Math.PI/2 + nAng/2;
-      domains.forEach((d,i)=>{
-        const a = nStart + i*nAng; const x = cx + Math.cos(a)*r2; const y = cy + Math.sin(a)*r2;
-        const btn = node(x,y,d.label,d.desc,'domain');
-        // connect to core
-        const e1 = line(cx,cy,x,y);
-        // lightly connect to nearest driver for visual grouping
-        let nearest = driverButtons.reduce((best,cur)=>{
-          const dx = cur.x - x, dy = cur.y - y; const dist = dx*dx + dy*dy; return (!best || dist<best.dist)? {node:cur, dist} : best;
-        }, null);
-        const e2 = line(nearest.node.x, nearest.node.y, x, y);
-        btn.__edges = [e1,e2]; coreBtn.__edges = (coreBtn.__edges||[]).concat(e1);
-      });
     }
 
     build();
-    window.addEventListener('resize', ()=>{ clearTimeout(svg.__r); svg.__r=setTimeout(build,120); });
+    window.addEventListener('resize', () => { clearTimeout(host.__r); host.__r = setTimeout(build, 120); });
   })();
 </script>
 
